@@ -590,45 +590,44 @@
                 return;
             }
 
-            google.accounts.id.initialize({
-                client_id: CLIENT_ID,
-                callback: handleCredentialResponse,
-                auto_select: false
-            });
+    let tokenClient;
 
-            google.accounts.id.renderButton(
-                document.getElementById('google_signin_button'),
-                {
-                    theme: 'outline',
-                    size: 'large',
-                    width: '100%'
-                }
-            );
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: handleCredentialResponse,
+    });
 
-            if (accessToken) {
+    // Create sign-in button
+    const signinButton = document.createElement('button');
+    signinButton.textContent = 'Sign in with Google';
+    signinButton.className = 'btn-primary';
+    signinButton.style.width = '100%';
+    signinButton.onclick = () => tokenClient.requestAccessToken();
+    document.getElementById('google_signin_button').appendChild(signinButton);            if (accessToken) {
                 updateGmailStatus();
             }
 
             renderAll();
         };
 
-        function handleCredentialResponse(response) {
-            accessToken = response.credential;
-            
-            // Decode JWT to get email
-            const base64Url = accessToken.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            
-            const decoded = JSON.parse(jsonPayload);
-            localStorage.setItem(GMAIL_TOKEN_KEY, accessToken);
-            localStorage.setItem('user_email', decoded.email);
-            
+            function handleCredentialResponse(response) {
+        accessToken = response.access_token;
+        
+        // Store the token
+        localStorage.setItem(GMAIL_TOKEN_KEY, accessToken);
+        
+        // Fetch user email from Gmail API
+        fetch('https://www.googleapis.com/gmail/v1/users/me/profile', {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+        }).then(r => r.json()).then(profile => {
+            localStorage.setItem('user_email', profile.emailAddress);
             updateGmailStatus();
-        }
-
+        }).catch(err => {
+            console.error('Error fetching user profile:', err);
+            updateGmailStatus();
+        });
+    }
         function updateGmailStatus() {
             const statusDiv = document.getElementById('gmail-status');
             const syncBtn = document.getElementById('sync-btn');
