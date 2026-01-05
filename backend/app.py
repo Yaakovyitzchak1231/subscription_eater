@@ -1,9 +1,11 @@
+import logging
 from datetime import datetime, timezone
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from sqlalchemy.orm import Session
 
 from .config import get_settings
@@ -12,6 +14,13 @@ from .gmail_sync import shutdown_scheduler, start_scheduler, subscription_summar
 from .models import Account
 from .oauth import exchange_code_for_credentials, generate_authorization_url
 from .schemas import AccountResponse, AccountSummary, AuthorizationUrlResponse, SubscriptionEntry
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
@@ -28,13 +37,17 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup() -> None:
+    logger.info("Starting Subscription Eater backend...")
     Base.metadata.create_all(bind=engine)
     start_scheduler()
+    logger.info("Application started successfully")
 
 
 @app.on_event("shutdown")
 def on_shutdown() -> None:
+    logger.info("Shutting down Subscription Eater backend...")
     shutdown_scheduler()
+    logger.info("Application shutdown complete")
 
 
 @app.get("/health")
@@ -53,13 +66,22 @@ def auth_callback(code: str = Query(...), state: str = Query(...), db: Session =
     try:
         credentials = exchange_code_for_credentials(code, state)
     except ValueError as exc:  # includes invalid state or missing refresh token
+        logger.error(f"OAuth credential exchange failed: {exc}")
         raise HTTPException(status_code=400, detail=str(exc))
 
-    service = build("gmail", "v1", credentials=credentials, cache_discovery=False)
-    profile = service.users().getProfile(userId="me").execute()
-    email = profile.get("emailAddress")
+    try:
+        service = build("gmail", "v1", credentials=credentials, cache_discovery=False)
+        profile = service.users().getProfile(userId="me").execute()
+        email = profile.get("emailAddress")
+    except HttpError as e:
+        logger.error(f"Gmail API error fetching profile: {e.resp.status} - {e}")
+        raise HTTPException(status_code=502, detail=f"Failed to fetch Gmail profile: {e.resp.status}")
+    except Exception as e:
+        logger.error(f"Unexpected error fetching Gmail profile: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch Gmail profile")
 
     if not email:
+        logger.error("Gmail profile did not contain emailAddress")
         raise HTTPException(status_code=400, detail="Unable to resolve account email from Google")
 
     account = db.query(Account).filter(Account.email == email).one_or_none()
@@ -70,6 +92,7 @@ def auth_callback(code: str = Query(...), state: str = Query(...), db: Session =
         account.token_json = credentials.to_json()
         account.token_expiry = credentials.expiry
         account.updated_at = datetime.now(timezone.utc)
+        logger.info(f"Updated existing account: {email}")
     else:
         account = Account(
             email=email,
@@ -79,6 +102,7 @@ def auth_callback(code: str = Query(...), state: str = Query(...), db: Session =
             token_expiry=credentials.expiry,
         )
         db.add(account)
+        logger.info(f"Created new account: {email}")
 
     db.commit()
     db.refresh(account)
