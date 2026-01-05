@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Eater</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root {
+            --color-primary: #2180ce;
+            --color-primary-hover: #1d72b3;
+            --color-error: #c01547;
+            --color-success: #208d8d;
+            --color-bg: #fcfcf9;
+            --color-surface: #ffffff;
+            --color-text: #133c3b;
+            --color-text-secondary: #626c71;
+            --color-border: rgba(94, 82, 64, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--color-text);
+            background-color: var(--color-bg);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            margin: 0 0 16px 0;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 28px;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(33, 128, 141, 0.08) 0%, rgba(33, 128, 141, 0.04) 100%);
+            border-radius: 6px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .setup-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--color-text);
+            background: var(--color-surface);
+            transition: border-color 150ms ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 150ms ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background: rgba(94, 82, 64, 0.12);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(94, 82, 64, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(192, 21, 47, 0.1);
+            color: var(--color-error);
+        }
+
+        .btn-danger:hover {
+            background: rgba(192, 21, 47, 0.2);
+        }
+
+        .btn-success {
+            background: rgba(33, 128, 141, 0.1);
+            color: var(--color-success);
+        }
+
+        .btn-success:hover {
+            background: rgba(33, 128, 141, 0.15);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .subscriptions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .subscription-item {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            transition: box-shadow 150ms ease;
+        }
+
+        .subscription-item:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .subscription-info {
+            flex: 1;
+        }
+
+        .subscription-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--color-text);
+        }
+
+        .subscription-email {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .subscription-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .subscription-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 32px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 16px;
+        }
+
+        .tab {
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 150ms ease;
+        }
+
+        .tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .badge-detected {
+            background: rgba(33, 128, 141, 0.1);
+            color: var(--color-success);
+        }
+
+        .badge-ai {
+            background: rgba(33, 128, 141, 0.15);
+            color: var(--color-primary);
+        }
+
+        .badge-synced {
+            background: rgba(33, 128, 141, 0.1);
+            color: var(--color-success);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-surface);
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            padding: 0;
+            width: 24px;
+            height: 24px;
+        }
+
+        .email-preview {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin: 12px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 16px;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            background: rgba(33, 128, 141, 0.1);
+            color: var(--color-success);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .gmail-status {
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .gmail-status.connected {
+            background: rgba(33, 128, 141, 0.1);
+            color: var(--color-success);
+        }
+
+        .gmail-status.disconnected {
+            background: rgba(192, 21, 47, 0.1);
+            color: var(--color-error);
+        }
+
+        #google_signin_button {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .subscription-item {
+                flex-direction: column;
+            }
+
+            .subscription-actions {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="card">
+                <h2 style="margin-top: 0;">Subscription Eater</h2>
+                <p style="margin: 0 0 16px 0; font-size: 13px; color: var(--color-text-secondary);">AI-powered subscription tracker for your inbox.</p>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top: 0;">Gmail Connection</h3>
+                <div id="gmail-status" class="gmail-status disconnected">
+                    ⚙️ Not connected
+                </div>
+                <div id="google_signin_button"></div>
+                <button id="sync-btn" class="btn-primary" style="width: 100%; margin-top: 12px; display: none;" onclick="syncGmail()">
+                    🔄 Sync Inbox
+                </button>
+                <button id="logout-btn" class="btn-secondary" style="width: 100%; margin-top: 8px; display: none;" onclick="logout()">
+                    Logout
+                </button>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top: 0;">Stats</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-subs">0</span>
+                        <span class="stat-label">Active</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="monthly-cost">$0</span>
+                        <span class="stat-label">Monthly</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card setup-section">
+                <h3 style="margin-top: 0;">Manual Test</h3>
+                <div class="form-group">
+                    <label for="email-input">Email Subject</label>
+                    <input type="text" id="email-input" placeholder="subject: renewal">
+                </div>
+                <div class="form-group">
+                    <label for="email-body">Email Body</label>
+                    <textarea id="email-body" placeholder="Paste email content..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="addDemoEmail()" style="width: 100%;">Analyze Email</button>
+                <button class="btn-secondary" onclick="loadSampleData()" style="width: 100%; margin-top: 8px;">Load Sample Data</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('active')">Active Subscriptions</button>
+                    <button class="tab" onclick="switchTab('cancelled')">Cancelled</button>
+                    <button class="tab" onclick="switchTab('detected')">Detected</button>
+                </div>
+
+                <div id="active" class="tab-content active">
+                    <div id="active-list" class="subscriptions-list"></div>
+                </div>
+
+                <div id="cancelled" class="tab-content">
+                    <div id="cancelled-list" class="subscriptions-list"></div>
+                </div>
+
+                <div id="detected" class="tab-content">
+                    <div id="detected-list" class="subscriptions-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="email-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0;" id="modal-title">Email Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'subscription_eater_data';
+        const GMAIL_TOKEN_KEY = 'gmail_access_token';
+        
+        // Gmail API Configuration
+        // IMPORTANT: Replace with your actual Client ID from Google Cloud Console
+        const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+        const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly';
+
+        // Initialize data structure
+        const defaultData = {
+            subscriptions: [],
+            detected: [],
+            cancelled: []
+        };
+
+        let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+        let accessToken = localStorage.getItem(GMAIL_TOKEN_KEY);
+
+        // Subscription detection patterns (fallback heuristics)
+        const subscriptionPatterns = [
+            /renewal|renew/i,
+            /subscription|subscribe/i,
+            /billing|payment due/i,
+            /invoice|receipt/i,
+            /membership/i,
+            /annual fee|yearly/i,
+            /auto.?renewal|auto.?pay/i,
+            /account.*active/i,
+            /thanks for being a/i,
+            /upgrade.*account/i,
+        ];
+
+        const unsubscribePatterns = [
+            /<a[^>]*href=["']([^"']*unsubscribe[^"']*)["'][^>]*>/i,
+            /list-unsubscribe:\s*<([^>]+)>/i,
+            /unsubscribe:\s*([^\n]+)/i,
+            /click\s+(?:here|below)[^.]*to\s+unsubscribe.*?href=["']([^"']+)["']/i,
+            /manage\s+(?:preferences|settings|subscription).*?href=["']([^"']+)["']/i,
+        ];
+
+        // Initialize Google Sign-In
+        window.onload = function() {
+            if (CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com') {
+                console.warn('Gmail API Client ID not configured. Add your Client ID to enable Gmail integration.');
+                updateGmailStatus();
+                return;
+            }
+
+            google.accounts.id.initialize({
+                client_id: CLIENT_ID,
+                callback: handleCredentialResponse,
+                auto_select: false
+            });
+
+            google.accounts.id.renderButton(
+                document.getElementById('google_signin_button'),
+                {
+                    theme: 'outline',
+                    size: 'large',
+                    width: '100%'
+                }
+            );
+
+            if (accessToken) {
+                updateGmailStatus();
+            }
+
+            renderAll();
+        };
+
+        function handleCredentialResponse(response) {
+            accessToken = response.credential;
+            
+            // Decode JWT to get email
+            const base64Url = accessToken.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            
+            const decoded = JSON.parse(jsonPayload);
+            localStorage.setItem(GMAIL_TOKEN_KEY, accessToken);
+            localStorage.setItem('user_email', decoded.email);
+            
+            updateGmailStatus();
+        }
+
+        function updateGmailStatus() {
+            const statusDiv = document.getElementById('gmail-status');
+            const syncBtn = document.getElementById('sync-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const signinBtn = document.getElementById('google_signin_button');
+
+            if (accessToken) {
+                const userEmail = localStorage.getItem('user_email');
+                statusDiv.textContent = `✅ Connected (${userEmail})`;
+                statusDiv.className = 'gmail-status connected';
+                syncBtn.style.display = 'block';
+                logoutBtn.style.display = 'block';
+                signinBtn.style.display = 'none';
+            } else {
+                statusDiv.textContent = '⚙️ Not connected';
+                statusDiv.className = 'gmail-status disconnected';
+                syncBtn.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                signinBtn.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            accessToken = null;
+            localStorage.removeItem(GMAIL_TOKEN_KEY);
+            localStorage.removeItem('user_email');
+            google.accounts.id.disableAutoSelect();
+            updateGmailStatus();
+            renderAll();
+        }
+
+        async function syncGmail() {
+            if (!accessToken) {
+                alert('Not connected to Gmail');
+                return;
+            }
+
+            const syncBtn = document.getElementById('sync-btn');
+            syncBtn.textContent = 'Syncing...';
+            syncBtn.disabled = true;
+
+            try {
+                // Get list of messages
+                const response = await fetch(
+                    'https://www.googleapis.com/gmail/v1/users/me/messages?q=from:noreply OR from:no-reply OR subject:(subscription OR billing OR renewal)&maxResults=20',
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('Failed to fetch emails');
+
+                const messagesData = await response.json();
+                const messages = messagesData.messages || [];
+
+                if (messages.length === 0) {
+                    alert('No subscription-related emails found');
+                    syncBtn.textContent = '🔄 Sync Inbox';
+                    syncBtn.disabled = false;
+                    return;
+                }
+
+                // Fetch full message details
+                let synced = 0;
+                for (const message of messages.slice(0, 10)) {
+                    const msgResponse = await fetch(
+                        `https://www.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${accessToken}`
+                            }
+                        }
+                    );
+
+                    const msgData = await msgResponse.json();
+                    const headers = msgData.payload.headers;
+                    const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+                    const from = headers.find(h => h.name === 'From')?.value || 'Unknown';
+                    
+                    let body = '';
+                    if (msgData.payload.parts) {
+                        const textPart = msgData.payload.parts.find(p => p.mimeType === 'text/plain');
+                        if (textPart) {
+                            body = atob(textPart.body.data || '');
+                        }
+                    } else if (msgData.payload.body?.data) {
+                        body = atob(msgData.payload.body.data);
+                    }
+
+                    // Check if already processed
+                    const exists = data.subscriptions.some(s => s.gmailId === message.id) ||
+                                 data.detected.some(d => d.gmailId === message.id);
+                    
+                    if (exists) continue;
+
+                    const detection = detectSubscription(subject, body);
+                    const unsubscribeLink = extractUnsubscribeLink(msgData.payload);
+                    const serviceName = extractServiceName(subject);
+
+                    const email = {
+                        id: Date.now() + Math.random(),
+                        gmailId: message.id,
+                        subject: subject,
+                        body: body.substring(0, 500),
+                        from: from,
+                        timestamp: new Date().toLocaleDateString(),
+                        isSubscription: detection.isSubscription,
+                        confidence: detection.confidence,
+                        unsubscribeLink: unsubscribeLink,
+                        serviceName: serviceName,
+                        syncedFrom: 'gmail',
+                        status: 'detected'
+                    };
+
+                    if (detection.isSubscription) {
+                        data.subscriptions.push({
+                            ...email,
+                            status: 'active',
+                            monthlyCost: 9.99,
+                            billingCycle: 'monthly'
+                        });
+                    } else {
+                        data.detected.push(email);
+                    }
+
+                    synced++;
+                }
+
+                saveData();
+                renderAll();
+                alert(`Synced ${synced} emails`);
+
+            } catch (error) {
+                console.error('Sync error:', error);
+                alert('Error syncing Gmail: ' + error.message);
+                if (error.message.includes('401')) {
+                    logout();
+                }
+            } finally {
+                syncBtn.textContent = '🔄 Sync Inbox';
+                syncBtn.disabled = false;
+            }
+        }
+
+        function extractUnsubscribeLink(payload) {
+            try {
+                const headers = payload.headers;
+                const unsubHeader = headers?.find(h => h.name === 'List-Unsubscribe')?.value;
+                
+                if (unsubHeader) {
+                    const match = unsubHeader.match(/<([^>]+)>/);
+                    if (match) return match[1];
+                }
+            } catch (e) {}
+
+            // Fallback: search in body
+            if (payload.parts) {
+                const textPart = payload.parts.find(p => p.mimeType === 'text/html' || p.mimeType === 'text/plain');
+                if (textPart?.body?.data) {
+                    const body = atob(textPart.body.data);
+                    for (const pattern of unsubscribePatterns) {
+                        const match = body.match(pattern);
+                        if (match && match[1]) return match[1].trim();
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function detectSubscription(subject, body) {
+            const text = (subject + ' ' + body).toLowerCase();
+            let confidence = 0;
+
+            for (const pattern of subscriptionPatterns) {
+                if (pattern.test(text)) {
+                    confidence += 20;
+                }
+            }
+
+            return {
+                isSubscription: confidence >= 40,
+                confidence: Math.min(100, confidence),
+                detectionMethod: 'pattern'
+            };
+        }
+
+        function extractServiceName(subject) {
+            const patterns = [
+                /^(?:Your\s+)?(\w+)(?:\s+account)?/,
+                /(?:from|by)\s+(\w+)/,
+                /(\w+)\s+(?:notification|update|confirmation)/,
+            ];
+
+            for (const pattern of patterns) {
+                const match = subject.match(pattern);
+                if (match && match[1]) {
+                    return match[1].charAt(0).toUpperCase() + match[1].slice(1);
+                }
+            }
+
+            return subject.split(' ')[0] || 'Subscription';
+        }
+
+        function addDemoEmail() {
+            const emailInput = document.getElementById('email-input').value.trim();
+            const emailBody = document.getElementById('email-body').value.trim();
+
+            if (!emailInput || !emailBody) {
+                alert('Please enter email subject and body');
+                return;
+            }
+
+            const detection = detectSubscription(emailInput, emailBody);
+            const unsubscribeLink = extractUnsubscribeLink({parts: [], headers: []});
+            const serviceName = extractServiceName(emailInput);
+
+            const email = {
+                id: Date.now(),
+                subject: emailInput,
+                body: emailBody,
+                from: 'noreply@service.com',
+                timestamp: new Date().toLocaleDateString(),
+                isSubscription: detection.isSubscription,
+                confidence: detection.confidence,
+                unsubscribeLink: unsubscribeLink,
+                serviceName: serviceName,
+                status: 'detected'
+            };
+
+            if (detection.isSubscription) {
+                data.subscriptions.push({
+                    ...email,
+                    status: 'active',
+                    monthlyCost: 9.99,
+                    billingCycle: 'monthly'
+                });
+            } else {
+                data.detected.push(email);
+            }
+
+            saveData();
+            renderAll();
+
+            document.getElementById('email-input').value = '';
+            document.getElementById('email-body').value = '';
+        }
+
+        function loadSampleData() {
+            data.subscriptions = [
+                {
+                    id: 1,
+                    serviceName: 'Netflix',
+                    subject: 'Your Netflix subscription renewed',
+                    body: 'Your account has been renewed...',
+                    from: 'billing@netflix.com',
+                    timestamp: '2025-01-05',
+                    isSubscription: true,
+                    confidence: 95,
+                    status: 'active',
+                    monthlyCost: 15.99,
+                    billingCycle: 'monthly',
+                    unsubscribeLink: 'https://netflix.com/unsubscribe'
+                },
+                {
+                    id: 2,
+                    serviceName: 'Spotify',
+                    subject: 'Spotify Premium renewal confirmation',
+                    body: 'Your Spotify Premium subscription...',
+                    from: 'no-reply@spotify.com',
+                    timestamp: '2025-01-04',
+                    isSubscription: true,
+                    confidence: 90,
+                    status: 'active',
+                    monthlyCost: 11.99,
+                    billingCycle: 'monthly',
+                    unsubscribeLink: 'https://spotify.com/account'
+                },
+                {
+                    id: 3,
+                    serviceName: 'Adobe Creative Cloud',
+                    subject: 'Your Adobe Creative Cloud annual subscription',
+                    body: 'Thanks for being a valued Adobe customer...',
+                    from: 'billing@adobe.com',
+                    timestamp: '2025-01-03',
+                    isSubscription: true,
+                    confidence: 85,
+                    status: 'active',
+                    monthlyCost: 54.99,
+                    billingCycle: 'monthly',
+                    unsubscribeLink: 'https://adobe.com/account/plan'
+                }
+            ];
+
+            data.cancelled = [
+                {
+                    id: 4,
+                    serviceName: 'LinkedIn Premium',
+                    subject: 'LinkedIn Premium subscription cancelled',
+                    from: 'billing@linkedin.com',
+                    timestamp: '2024-12-20',
+                    status: 'cancelled',
+                    monthlyCost: 39.99
+                }
+            ];
+
+            saveData();
+            renderAll();
+        }
+
+        function cancelSubscription(id) {
+            const sub = data.subscriptions.find(s => s.id === id);
+            if (!sub) return;
+
+            if (sub.unsubscribeLink) {
+                window.open(sub.unsubscribeLink, '_blank');
+            } else {
+                alert('No unsubscribe link found. Check the original email.');
+            }
+
+            data.cancelled.push({
+                ...sub,
+                status: 'cancelled',
+                cancelledDate: new Date().toLocaleDateString()
+            });
+
+            data.subscriptions = data.subscriptions.filter(s => s.id !== id);
+            saveData();
+            renderAll();
+        }
+
+        function acceptDetected(id) {
+            const detected = data.detected.find(d => d.id === id);
+            if (!detected) return;
+
+            data.subscriptions.push({
+                ...detected,
+                status: 'active',
+                monthlyCost: 9.99,
+                billingCycle: 'monthly'
+            });
+
+            data.detected = data.detected.filter(d => d.id !== id);
+            saveData();
+            renderAll();
+        }
+
+        function rejectDetected(id) {
+            data.detected = data.detected.filter(d => d.id !== id);
+            saveData();
+            renderAll();
+        }
+
+        function showEmailDetails(id, section) {
+            const collections = {
+                active: data.subscriptions,
+                cancelled: data.cancelled,
+                detected: data.detected
+            };
+
+            const email = collections[section]?.find(e => e.id === id);
+            if (!email) return;
+
+            const modal = document.getElementById('email-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+
+            title.textContent = `${email.serviceName} - Details`;
+
+            let html = `
+                <div class="form-group">
+                    <label>Service</label>
+                    <input type="text" value="${email.serviceName}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" value="${email.subject}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>From</label>
+                    <input type="text" value="${email.from}" disabled>
+                </div>
+            `;
+
+            if (email.syncedFrom === 'gmail') {
+                html += `<div class="form-group"><div class="status-badge">✅ Synced from Gmail</div></div>`;
+            }
+
+            if (email.confidence !== undefined) {
+                html += `
+                    <div class="form-group">
+                        <label>Detection Confidence</label>
+                        <div style="padding: 8px 12px; background: var(--color-bg); border-radius: 6px;">
+                            ${email.confidence}%
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (email.monthlyCost) {
+                html += `
+                    <div class="form-group">
+                        <label>Monthly Cost</label>
+                        <input type="text" value="$${email.monthlyCost}" disabled>
+                    </div>
+                `;
+            }
+
+            if (email.unsubscribeLink) {
+                html += `
+                    <div class="form-group">
+                        <label>Unsubscribe Link</label>
+                        <input type="text" value="${email.unsubscribeLink}" disabled style="font-size: 11px;">
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="form-group">
+                    <label>Email Preview</label>
+                    <div class="email-preview">${(email.body || email.subject).substring(0, 300)}</div>
+                </div>
+            `;
+
+            body.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('email-modal').classList.remove('active');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+
+            renderAll();
+        }
+
+        function renderAll() {
+            renderSubscriptions();
+            renderCancelled();
+            renderDetected();
+            updateStats();
+        }
+
+        function renderSubscriptions() {
+            const list = document.getElementById('active-list');
+            if (data.subscriptions.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>No active subscriptions tracked</p></div>';
+                return;
+            }
+
+            list.innerHTML = data.subscriptions.map(sub => `
+                <div class="subscription-item">
+                    <div class="subscription-info">
+                        <div class="subscription-name">
+                            ${sub.serviceName}
+                            ${sub.syncedFrom === 'gmail' ? '<span class="badge badge-synced">Gmail</span>' : ''}
+                        </div>
+                        <div class="subscription-email">${sub.from}</div>
+                        <div class="subscription-meta">
+                            <span>💰 $${sub.monthlyCost}/month</span>
+                            <span>📅 ${sub.billingCycle}</span>
+                            <span>${sub.timestamp}</span>
+                        </div>
+                    </div>
+                    <div class="subscription-actions">
+                        <button class="btn-sm btn-secondary" onclick="showEmailDetails(${sub.id}, 'active')">Details</button>
+                        <button class="btn-sm btn-danger" onclick="cancelSubscription(${sub.id})">Cancel</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCancelled() {
+            const list = document.getElementById('cancelled-list');
+            if (data.cancelled.length === 0) {
+                list.innerHTML = '<div class="no-data">No cancelled subscriptions</div>';
+                return;
+            }
+
+            list.innerHTML = data.cancelled.map(sub => `
+                <div class="subscription-item">
+                    <div class="subscription-info">
+                        <div class="subscription-name">${sub.serviceName}</div>
+                        <div class="subscription-email">${sub.from}</div>
+                        <div class="subscription-meta">
+                            <span>💰 Was $${sub.monthlyCost}/month</span>
+                            <span>❌ Cancelled on ${sub.timestamp}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDetected() {
+            const list = document.getElementById('detected-list');
+            if (data.detected.length === 0) {
+                list.innerHTML = '<div class="no-data">No unconfirmed subscriptions detected</div>';
+                return;
+            }
+
+            list.innerHTML = data.detected.map(det => `
+                <div class="subscription-item">
+                    <div class="subscription-info">
+                        <div class="subscription-name">${det.serviceName} <span class="badge badge-ai">AI Detected</span></div>
+                        <div class="subscription-email">${det.from}</div>
+                        <div class="subscription-meta">
+                            <span>🎯 ${det.confidence}% confidence</span>
+                            <span>${det.timestamp}</span>
+                        </div>
+                    </div>
+                    <div class="subscription-actions">
+                        <button class="btn-sm btn-secondary" onclick="showEmailDetails(${det.id}, 'detected')">Details</button>
+                        <button class="btn-sm btn-success" onclick="acceptDetected(${det.id})">Add</button>
+                        <button class="btn-sm btn-secondary" onclick="rejectDetected(${det.id})">Reject</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            const totalSubs = data.subscriptions.length;
+            const monthlyCost = data.subscriptions.reduce((sum, s) => sum + (s.monthlyCost || 0), 0);
+
+            document.getElementById('total-subs').textContent = totalSubs;
+            document.getElementById('monthly-cost').textContent = '$' + monthlyCost.toFixed(2);
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // Close modal on outside click
+        document.getElementById('email-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
