@@ -1,6 +1,12 @@
 from functools import lru_cache
+from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings
+
+
+BACKEND_ENV_PATH = Path(__file__).with_name(".env")
+DEFAULT_ENV_PATH = Path(".env")
+ENV_FILE = BACKEND_ENV_PATH if BACKEND_ENV_PATH.exists() else DEFAULT_ENV_PATH
 
 
 class Settings(BaseSettings):
@@ -17,7 +23,7 @@ class Settings(BaseSettings):
     database_url: str = Field("sqlite:///./subscription_eater.db", alias="DATABASE_URL")
 
     class Config:
-        env_file = ".env"
+        env_file = ENV_FILE
         env_file_encoding = "utf-8"
         extra = "ignore"
 
