@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timezone
 from typing import Iterable, Optional
+import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from google.oauth2.credentials import Credentials
@@ -14,6 +15,10 @@ from .oauth import build_gmail_service
 
 settings = get_settings()
 _scheduler: Optional[BackgroundScheduler] = None
+
+# Set up logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 SUBSCRIPTION_KEYWORDS = [
@@ -83,16 +88,25 @@ def _keyword_for_message(subject: Optional[str], snippet: Optional[str]) -> Opti
 
 
 def sync_account_messages(db: Session, account: Account) -> None:
+    logger.info(f"🔄 Starting sync for account: {account.email}")
+    
     token_info = json.loads(account.token_json)
     credentials = Credentials.from_authorized_user_info(token_info)
-    credentials.token = account.access_token
-    credentials.refresh_token = account.refresh_token
-    credentials.expiry = account.token_expiry
+    
+    # Update the token if it's different
+    if credentials.token != account.access_token:
+        credentials.token = account.access_token
+    
+    # The refresh_token should be in the token_json already, but ensure expiry is set
+    if account.token_expiry:
+        credentials.expiry = account.token_expiry
 
     service = build_gmail_service(credentials)
     query = settings.subscription_query
     message_ids: Iterable[dict] = []
 
+    logger.info(f"📧 Searching for emails with query: {query}")
+    
     response = (
         service.users()
         .messages()
@@ -100,10 +114,15 @@ def sync_account_messages(db: Session, account: Account) -> None:
         .execute()
     )
     if not response:
+        logger.info("No emails found")
         return
     message_ids = response.get("messages", [])
+    logger.info(f"Found {len(message_ids)} emails matching the query")
 
-    for message_info in message_ids:
+    processed = 0
+    for idx, message_info in enumerate(message_ids, 1):
+        logger.info(f"Processing email {idx}/{len(message_ids)}: {message_info['id']}")
+        
         message = (
             service.users()
             .messages()
@@ -138,16 +157,24 @@ def sync_account_messages(db: Session, account: Account) -> None:
     account.token_expiry = credentials.expiry
     account.last_synced_at = datetime.now(timezone.utc)
     db.commit()
+    logger.info(f"✅ Sync completed for {account.email}")
 
 
 def sync_all_accounts() -> None:
+    logger.info("=" * 50)
+    logger.info("🚀 Starting gmail sync for all accounts")
     db = SessionLocal()
     try:
         accounts = db.query(Account).all()
+        logger.info(f"Found {len(accounts)} account(s) to sync")
         for account in accounts:
             sync_account_messages(db, account)
+        logger.info("✨ All accounts synced successfully!")
+    except Exception as e:
+        logger.error(f"❌ Error during sync: {e}", exc_info=True)
     finally:
         db.close()
+    logger.info("=" * 50)
 
 
 def start_scheduler() -> BackgroundScheduler:
