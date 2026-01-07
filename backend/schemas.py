@@ -47,6 +47,7 @@ class SubscriptionResponse(BaseModel):
     cost: Optional[float]
     currency: str
     billing_cycle: Optional[str]
+    category: Optional[str]
     status: str
     renewal_date: Optional[datetime]
     confidence_score: float

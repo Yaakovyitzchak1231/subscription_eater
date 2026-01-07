@@ -55,6 +55,7 @@ class Subscription(Base):
     cost = Column(Float, nullable=True)
     currency = Column(String, default="USD")
     billing_cycle = Column(String, nullable=True)  # "monthly", "yearly"
+    category = Column(String, nullable=True) # "Entertainment", "Utilities", etc.
     status = Column(String, default="active")  # "active", "cancelled", "detected", "deleted"
     renewal_date = Column(DateTime, nullable=True)
 
