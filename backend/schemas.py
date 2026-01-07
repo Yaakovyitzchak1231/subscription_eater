@@ -39,3 +39,23 @@ class SubscriptionEntry(BaseModel):
 class AccountSummary(BaseModel):
     accounts: List[AccountResponse]
     subscription_entries: List[SubscriptionEntry]
+
+
+class SubscriptionResponse(BaseModel):
+    id: int
+    service_name: str
+    cost: Optional[float]
+    currency: str
+    billing_cycle: Optional[str]
+    status: str
+    renewal_date: Optional[datetime]
+    confidence_score: float
+    is_confirmed: bool
+
+    # Metadata
+    account_email: Optional[str] = None
+    source_email_subject: Optional[str] = None
+    source_email_from: Optional[str] = None
+
+    class Config:
+        from_attributes = True

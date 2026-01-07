@@ -1,4 +1,5 @@
 import json
+import base64
 from datetime import datetime, timezone
 from typing import Iterable, Optional
 import logging
@@ -10,8 +11,9 @@ from sqlalchemy.orm import Session
 
 from .config import get_settings
 from .database import SessionLocal
-from .models import Account, EmailMessage
+from .models import Account, EmailMessage, Subscription
 from .oauth import build_gmail_service
+from .parser import SubscriptionParser
 
 settings = get_settings()
 _scheduler: Optional[BackgroundScheduler] = None
@@ -36,6 +38,22 @@ def _header_value(headers: list[dict], name: str) -> Optional[str]:
             return header.get("value")
     return None
 
+def _extract_body(payload: dict) -> str:
+    """Extracts plain text body from Gmail payload."""
+    body_text = ""
+    if "parts" in payload:
+        for part in payload["parts"]:
+            if part.get("mimeType") == "text/plain":
+                data = part.get("body", {}).get("data")
+                if data:
+                    body_text += base64.urlsafe_b64decode(data).decode("utf-8")
+    elif "body" in payload and payload["body"].get("data"):
+         # Some messages are just flat bodies without parts
+         data = payload["body"]["data"]
+         body_text = base64.urlsafe_b64decode(data).decode("utf-8")
+
+    return body_text
+
 
 def _upsert_message(
     db: Session,
@@ -45,6 +63,7 @@ def _upsert_message(
     subject: Optional[str],
     from_address: Optional[str],
     snippet: Optional[str],
+    body_text: Optional[str],
     internal_date: Optional[datetime],
     keyword: Optional[str],
     history_id: Optional[str],
@@ -54,29 +73,69 @@ def _upsert_message(
         .filter(EmailMessage.account_id == account_id, EmailMessage.gmail_message_id == message_id)
         .one_or_none()
     )
+
+    email_obj = existing
     if existing:
         existing.subject = subject
         existing.from_address = from_address
         existing.snippet = snippet
+        if body_text:
+            existing.body_text = body_text
         existing.internal_date = internal_date
         existing.subscription_keyword = keyword or existing.subscription_keyword
         existing.thread_id = thread_id
         existing.history_id = history_id
-        return
-
-    db.add(
-        EmailMessage(
+    else:
+        email_obj = EmailMessage(
             account_id=account_id,
             gmail_message_id=message_id,
             thread_id=thread_id,
             subject=subject,
             from_address=from_address,
             snippet=snippet,
+            body_text=body_text,
             internal_date=internal_date,
             subscription_keyword=keyword,
             history_id=history_id,
         )
+        db.add(email_obj)
+        db.flush() # get ID
+
+    # Run parser
+    parser = SubscriptionParser()
+    # Use body_text if available, else snippet
+    content_to_parse = body_text or snippet or ""
+
+    parsed_data = parser.parse_email(
+        subject=subject or "",
+        body=content_to_parse,
+        sender=from_address or ""
     )
+
+    if parsed_data:
+        # Check if subscription already exists for this email
+        sub = db.query(Subscription).filter(Subscription.email_message_id == email_obj.id).one_or_none()
+        if sub:
+            # Update
+            sub.service_name = parsed_data["service_name"]
+            sub.cost = parsed_data["cost"]
+            sub.currency = parsed_data["currency"]
+            sub.billing_cycle = parsed_data["billing_cycle"]
+            sub.confidence_score = parsed_data["confidence_score"]
+        else:
+            # Create
+            sub = Subscription(
+                account_id=account_id,
+                email_message_id=email_obj.id,
+                service_name=parsed_data["service_name"],
+                cost=parsed_data["cost"],
+                currency=parsed_data["currency"],
+                billing_cycle=parsed_data["billing_cycle"],
+                status=parsed_data["status"],
+                confidence_score=parsed_data["confidence_score"],
+                renewal_date=internal_date # Rough guess: renewal is around the email date
+            )
+            db.add(sub)
 
 
 def _keyword_for_message(subject: Optional[str], snippet: Optional[str]) -> Optional[str]:
@@ -123,34 +182,42 @@ def sync_account_messages(db: Session, account: Account) -> None:
     for idx, message_info in enumerate(message_ids, 1):
         logger.info(f"Processing email {idx}/{len(message_ids)}: {message_info['id']}")
         
-        message = (
-            service.users()
-            .messages()
-            .get(userId="me", id=message_info["id"], format="metadata", metadataHeaders=["Subject", "From"])
-            .execute()
-        )
-        headers = message.get("payload", {}).get("headers", [])
-        subject = _header_value(headers, "Subject")
-        from_address = _header_value(headers, "From")
-        snippet = message.get("snippet")
-        internal_date_ms = message.get("internalDate")
-        internal_date = None
-        if internal_date_ms:
-            internal_date = datetime.fromtimestamp(int(internal_date_ms) / 1000, tz=timezone.utc)
-        keyword = _keyword_for_message(subject, snippet)
+        try:
+            message = (
+                service.users()
+                .messages()
+                .get(userId="me", id=message_info["id"], format="full")
+                .execute()
+            )
+            payload = message.get("payload", {})
+            headers = payload.get("headers", [])
+            subject = _header_value(headers, "Subject")
+            from_address = _header_value(headers, "From")
+            snippet = message.get("snippet")
+            body_text = _extract_body(payload)
 
-        _upsert_message(
-            db=db,
-            account_id=account.id,
-            message_id=message.get("id"),
-            thread_id=message.get("threadId"),
-            subject=subject,
-            from_address=from_address,
-            snippet=snippet,
-            internal_date=internal_date,
-            keyword=keyword,
-            history_id=message.get("historyId"),
-        )
+            internal_date_ms = message.get("internalDate")
+            internal_date = None
+            if internal_date_ms:
+                internal_date = datetime.fromtimestamp(int(internal_date_ms) / 1000, tz=timezone.utc)
+            keyword = _keyword_for_message(subject, snippet)
+
+            _upsert_message(
+                db=db,
+                account_id=account.id,
+                message_id=message.get("id"),
+                thread_id=message.get("threadId"),
+                subject=subject,
+                from_address=from_address,
+                snippet=snippet,
+                body_text=body_text,
+                internal_date=internal_date,
+                keyword=keyword,
+                history_id=message.get("historyId"),
+            )
+        except Exception as e:
+            logger.error(f"Error processing message {message_info['id']}: {e}")
+            continue
 
     account.access_token = credentials.token
     account.token_json = credentials.to_json()
