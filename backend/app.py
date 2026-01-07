@@ -14,6 +14,7 @@ from .gmail_sync import shutdown_scheduler, start_scheduler, subscription_summar
 from .models import Account, Subscription
 from .oauth import exchange_code_for_credentials, generate_authorization_url
 from .schemas import AccountResponse, AccountSummary, AuthorizationUrlResponse, SubscriptionEntry, SubscriptionResponse
+from .update_schema import SubscriptionUpdate
 
 settings = get_settings()
 
@@ -130,6 +131,39 @@ def list_subscriptions(db: Session = Depends(get_db)):
 def trigger_sync():
     sync_all_accounts()
     return {"status": "sync-started"}
+
+
+@app.put("/api/subscriptions/{subscription_id}", response_model=SubscriptionResponse)
+def update_subscription(subscription_id: int, update_data: SubscriptionUpdate, db: Session = Depends(get_db)):
+    sub = db.query(Subscription).filter(Subscription.id == subscription_id).one_or_none()
+    if not sub:
+        raise HTTPException(status_code=404, detail="Subscription not found")
+
+    if update_data.cost is not None:
+        sub.cost = update_data.cost
+    if update_data.currency is not None:
+        sub.currency = update_data.currency
+    if update_data.billing_cycle is not None:
+        sub.billing_cycle = update_data.billing_cycle
+    if update_data.category is not None:
+        sub.category = update_data.category
+    if update_data.status is not None:
+        sub.status = update_data.status
+    if update_data.renewal_date is not None:
+        try:
+            sub.renewal_date = datetime.fromisoformat(update_data.renewal_date.replace('Z', '+00:00'))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Expected ISO 8601.")
+
+    db.commit()
+    db.refresh(sub)
+
+    resp = SubscriptionResponse.from_orm(sub)
+    resp.account_email = sub.account.email
+    if sub.source_email:
+        resp.source_email_subject = sub.source_email.subject
+        resp.source_email_from = sub.source_email.from_address
+    return resp
 
 
 # Serve dashboard HTML for root path

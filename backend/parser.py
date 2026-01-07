@@ -35,6 +35,16 @@ class SubscriptionParser:
         "yearly": [r'per year', r'/yr', r'yearly', r'annually', r'annual', r'every year', r'next year']
     }
 
+    CATEGORY_KEYWORDS = {
+        "Entertainment": ["netflix", "spotify", "hulu", "disney", "youtube", "prime video", "hbo", "cinema", "music", "game", "steam", "playstation", "xbox", "nintendo"],
+        "Software": ["github", "adobe", "jetbrains", "slack", "zoom", "google workspace", "microsoft 365", "dropbox", "atlassian", "linear", "vercel", "aws", "cloud", "hosting", "domain", "vpn"],
+        "Utilities": ["electric", "water", "gas", "internet", "broadband", "mobile", "phone", "att", "verizon", "t-mobile", "vodafone", "comcast", "xfinity"],
+        "Shopping": ["amazon", "ebay", "walmart", "target", "shopify", "order"],
+        "News": ["nytimes", "wsj", "washington post", "guardian", "substack", "medium", "bloomberg"],
+        "Health": ["gym", "fitness", "yoga", "meditation", "health", "insurance", "medical"],
+        "Food": ["uber eats", "doordash", "grubhub", "hellofresh", "blue apron", "instacart"]
+    }
+
     def parse_email(self, subject: str, body: str, sender: str) -> Optional[Dict[str, Any]]:
         """
         Main entry point. Returns a dict of subscription details or None if not a subscription.
@@ -48,12 +58,14 @@ class SubscriptionParser:
         service_name = self._extract_service_name(sender, subject)
         cost, currency = self._extract_cost(body) or (None, "USD")
         cycle = self._extract_cycle(body, subject)
+        category = self._extract_category(service_name, subject, body)
 
         return {
             "service_name": service_name,
             "cost": cost,
             "currency": currency,
             "billing_cycle": cycle,
+            "category": category,
             "confidence_score": confidence,
             "status": "active" # Default assumption for found receipts
         }
@@ -151,3 +163,19 @@ class SubscriptionParser:
                     return cycle_name
 
         return "monthly" # Default fallback? Or None?
+
+    def _extract_category(self, service_name: str, subject: str, body: str) -> str:
+        text = (service_name + " " + subject + " " + body).lower()
+
+        # Check service name first (higher priority)
+        service_lower = service_name.lower()
+        for category, keywords in self.CATEGORY_KEYWORDS.items():
+            if any(k in service_lower for k in keywords):
+                return category
+
+        # Then check subject/body
+        for category, keywords in self.CATEGORY_KEYWORDS.items():
+            if any(k in text for k in keywords):
+                return category
+
+        return "Other"
