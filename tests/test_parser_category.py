@@ -1,6 +1,3 @@
-
-import pytest
-import asyncio
 from backend.parser import SubscriptionParser
 
 def test_category_extraction():

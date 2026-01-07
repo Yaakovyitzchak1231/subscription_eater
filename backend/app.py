@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import List
 import os
 
+from dateutil import parser as date_parser
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
@@ -166,8 +167,8 @@ def update_subscription(subscription_id: int, update_data: SubscriptionUpdate, d
         sub.status = update_data.status
     if update_data.renewal_date is not None:
         try:
-            sub.renewal_date = datetime.fromisoformat(update_data.renewal_date.replace('Z', '+00:00'))
-        except ValueError:
+            sub.renewal_date = date_parser.isoparse(update_data.renewal_date)
+        except (ValueError, TypeError):
             raise HTTPException(status_code=400, detail="Invalid date format. Expected ISO 8601.")
 
     # Mark as manually edited so parser doesn't overwrite it
