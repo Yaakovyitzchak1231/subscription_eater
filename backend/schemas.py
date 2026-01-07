@@ -47,10 +47,13 @@ class SubscriptionResponse(BaseModel):
     cost: Optional[float]
     currency: str
     billing_cycle: Optional[str]
+    category: Optional[str]
     status: str
     renewal_date: Optional[datetime]
     confidence_score: float
     is_confirmed: bool
+    manually_edited: bool = False
+    is_hidden: bool = False
 
     # Metadata
     account_email: Optional[str] = None
@@ -59,3 +62,12 @@ class SubscriptionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class SubscriptionUpdate(BaseModel):
+    cost: Optional[float] = None
+    currency: Optional[str] = None
+    billing_cycle: Optional[str] = None
+    category: Optional[str] = None
+    status: Optional[str] = None
+    renewal_date: Optional[str] = None  # Accepts ISO format string or None

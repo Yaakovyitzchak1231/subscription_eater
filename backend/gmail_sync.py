@@ -116,11 +116,14 @@ def _upsert_message(
         # Check if subscription already exists for this email
         sub = db.query(Subscription).filter(Subscription.email_message_id == email_obj.id).one_or_none()
         if sub:
-            # Update
-            sub.service_name = parsed_data["service_name"]
-            sub.cost = parsed_data["cost"]
-            sub.currency = parsed_data["currency"]
-            sub.billing_cycle = parsed_data["billing_cycle"]
+            # Update only if not manually edited by user
+            if not sub.manually_edited:
+                sub.service_name = parsed_data["service_name"]
+                sub.cost = parsed_data["cost"]
+                sub.currency = parsed_data["currency"]
+                sub.billing_cycle = parsed_data["billing_cycle"]
+                sub.category = parsed_data.get("category", "Other")
+            # Always update these if parser runs again? Maybe confidence score changes.
             sub.confidence_score = parsed_data["confidence_score"]
         else:
             # Create
@@ -131,6 +134,7 @@ def _upsert_message(
                 cost=parsed_data["cost"],
                 currency=parsed_data["currency"],
                 billing_cycle=parsed_data["billing_cycle"],
+                category=parsed_data.get("category", "Other"),
                 status=parsed_data["status"],
                 confidence_score=parsed_data["confidence_score"],
                 renewal_date=internal_date # Rough guess: renewal is around the email date

@@ -55,11 +55,16 @@ class Subscription(Base):
     cost = Column(Float, nullable=True)
     currency = Column(String, default="USD")
     billing_cycle = Column(String, nullable=True)  # "monthly", "yearly"
-    status = Column(String, default="active")  # "active", "cancelled", "detected"
+    category = Column(String, nullable=True)  # "Entertainment", "Utilities", etc.
+    status = Column(String, default="active")  # "active", "cancelled", "detected", "deleted"
     renewal_date = Column(DateTime, nullable=True)
 
     confidence_score = Column(Float, default=0.0)
     is_confirmed = Column(Boolean, default=False)
+
+    # New fields for manual overrides
+    manually_edited = Column(Boolean, default=False)
+    is_hidden = Column(Boolean, default=False)
 
     created_at = Column(DateTime, default=func.now(), nullable=False)
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
