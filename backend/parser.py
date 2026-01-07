@@ -165,15 +165,16 @@ class SubscriptionParser:
         return "monthly" # Default fallback? Or None?
 
     def _extract_category(self, service_name: str, subject: str, body: str) -> str:
-        text = (service_name + " " + subject + " " + body).lower()
-
         # Check service name first (higher priority)
         service_lower = service_name.lower()
         for category, keywords in self.CATEGORY_KEYWORDS.items():
             if any(k in service_lower for k in keywords):
                 return category
 
-        # Then check subject/body
+        # Then check subject/body (we can reuse the fact that text usually contains service name,
+        # or just concatenate only subject+body if we wanted strictly those.
+        # But for simplicity and to match previous logic's intent efficiently:)
+        text = (subject + " " + body).lower()
         for category, keywords in self.CATEGORY_KEYWORDS.items():
             if any(k in text for k in keywords):
                 return category
