@@ -37,16 +37,20 @@ Follow these steps to enable real Gmail integration in Subscription Eater.
    - `http://localhost:8000`
 8. Click **CREATE**
 9. Copy the **Client ID** (looks like: `xxxxx.apps.googleusercontent.com`)
+10. Copy the **Client Secret**
 
-## Step 4: Add Client ID to Subscription Eater
+## Step 4: Configure Backend Environment Variables
 
-1. Open `index.html`
-2. Find this line (around line 230):
-   ```javascript
-   const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
-   ```
-3. Replace `YOUR_CLIENT_ID` with your actual Client ID from Step 3
-4. Save the file
+Set the following environment variables for the backend (for example in `backend/.env` or a root `.env`):
+
+```bash
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret
+OAUTH_REDIRECT_URI=http://localhost:8000/auth/google/callback
+```
+
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` come from the OAuth client you created.
+- `OAUTH_REDIRECT_URI` must match one of the Authorized redirect URIs in Google Cloud.
 
 ## Step 5: Run Locally (or Deploy)
 
@@ -66,13 +70,13 @@ Then open: `http://localhost:3000`
 - Add your domain to Google Cloud OAuth redirect URIs
 - Update `Client ID` if needed
 
-## Step 6: Grant Permission
+## Step 6: Start the OAuth Flow
 
 1. Open the app in your browser
-2. Click the **Gmail Sign In** button
-3. Select your Google account
-4. Review permissions and click **Allow**
-5. You're connected!
+2. The frontend calls `GET /api/auth/google/start` to fetch an authorization URL
+3. You'll be redirected to Google to grant consent
+4. Google sends you back to `/api/auth/google/callback` (from `OAUTH_REDIRECT_URI`)
+5. The backend stores tokens and redirects you back to the dashboard
 
 ## Features After Setup
 
