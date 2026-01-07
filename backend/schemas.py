@@ -51,6 +51,8 @@ class SubscriptionResponse(BaseModel):
     renewal_date: Optional[datetime]
     confidence_score: float
     is_confirmed: bool
+    manually_edited: bool
+    is_hidden: bool
 
     # Metadata
     account_email: Optional[str] = None
@@ -59,3 +61,11 @@ class SubscriptionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class SubscriptionUpdate(BaseModel):
+    service_name: Optional[str] = None
+    cost: Optional[float] = None
+    currency: Optional[str] = None
+    billing_cycle: Optional[str] = None
+    status: Optional[str] = None
+    is_hidden: Optional[bool] = None

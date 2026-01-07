@@ -13,7 +13,7 @@ from .database import Base, engine, get_db
 from .gmail_sync import shutdown_scheduler, start_scheduler, subscription_summary, sync_all_accounts
 from .models import Account, Subscription
 from .oauth import exchange_code_for_credentials, generate_authorization_url
-from .schemas import AccountResponse, AccountSummary, AuthorizationUrlResponse, SubscriptionEntry, SubscriptionResponse
+from .schemas import AccountResponse, AccountSummary, AuthorizationUrlResponse, SubscriptionEntry, SubscriptionResponse, SubscriptionUpdate
 
 settings = get_settings()
 
@@ -30,6 +30,18 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup() -> None:
+    # Migrate database if needed
+    from sqlalchemy import inspect, text
+    inspector = inspect(engine)
+    if "subscriptions" in inspector.get_table_names():
+        columns = [c["name"] for c in inspector.get_columns("subscriptions")]
+        with engine.connect() as conn:
+            if "manually_edited" not in columns:
+                conn.execute(text("ALTER TABLE subscriptions ADD COLUMN manually_edited BOOLEAN DEFAULT FALSE"))
+            if "is_hidden" not in columns:
+                conn.execute(text("ALTER TABLE subscriptions ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE"))
+            conn.commit()
+
     Base.metadata.create_all(bind=engine)
     start_scheduler()
 
@@ -111,7 +123,7 @@ def list_accounts(db: Session = Depends(get_db)):
 
 @app.get("/api/subscriptions", response_model=List[SubscriptionResponse])
 def list_subscriptions(db: Session = Depends(get_db)):
-    subs = db.query(Subscription).join(Account).all()
+    subs = db.query(Subscription).join(Account).filter(Subscription.is_hidden == False).all()
 
     # Enrich with metadata that isn't directly on Subscription model (via relationships)
     response = []
@@ -124,6 +136,49 @@ def list_subscriptions(db: Session = Depends(get_db)):
         response.append(resp)
 
     return response
+
+
+@app.put("/api/subscriptions/{subscription_id}", response_model=SubscriptionResponse)
+def update_subscription(subscription_id: int, update: SubscriptionUpdate, db: Session = Depends(get_db)):
+    sub = db.query(Subscription).filter(Subscription.id == subscription_id).one_or_none()
+    if not sub:
+        raise HTTPException(status_code=404, detail="Subscription not found")
+
+    # Update fields if provided
+    update_data = update.dict(exclude_unset=True)
+    if not update_data:
+        return sub
+
+    for key, value in update_data.items():
+        setattr(sub, key, value)
+
+    # Mark as manually edited so parser doesn't overwrite it
+    sub.manually_edited = True
+    sub.updated_at = datetime.now(timezone.utc)
+
+    db.commit()
+    db.refresh(sub)
+
+    # Return response structure
+    resp = SubscriptionResponse.from_orm(sub)
+    resp.account_email = sub.account.email
+    if sub.source_email:
+        resp.source_email_subject = sub.source_email.subject
+        resp.source_email_from = sub.source_email.from_address
+    return resp
+
+
+@app.delete("/api/subscriptions/{subscription_id}", status_code=204)
+def delete_subscription(subscription_id: int, db: Session = Depends(get_db)):
+    sub = db.query(Subscription).filter(Subscription.id == subscription_id).one_or_none()
+    if not sub:
+        raise HTTPException(status_code=404, detail="Subscription not found")
+
+    # Soft delete (hide)
+    sub.is_hidden = True
+    sub.status = "deleted"
+    db.commit()
+    return
 
 
 @app.post("/api/sync", status_code=202)
