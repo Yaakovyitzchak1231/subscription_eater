@@ -2,6 +2,14 @@
 
 AI-powered email subscription tracker that monitors Gmail, detects subscriptions, and helps you track them.
 
+## Architecture
+This application uses a **FastAPI backend** (Python) to handle OAuth and data processing, and a static **HTML frontend** served by the backend.
+
+- **Backend:** `backend/app.py` (FastAPI)
+- **Frontend:** `index.html` (served at `/`)
+- **Database:** SQLite (local file)
+- **API Prefix:** All API endpoints are prefixed with `/api`
+
 ## Setup & Running Locally
 
 ### 1. Prerequisites
@@ -20,7 +28,8 @@ AI-powered email subscription tracker that monitors Gmail, detects subscriptions
 5. Create Credentials:
    - Go to "Credentials" > "Create Credentials" > "OAuth Client ID".
    - Application Type: **Web application**.
-   - Authorized Redirect URIs: `http://localhost:8000/api/auth/google/callback`
+   - **Authorized Redirect URIs:** `http://localhost:8000/api/auth/google/callback`
+     - *Note: Ensure this matches exactly. The backend listens on this path.*
    - Copy the **Client ID** and **Client Secret**.
 
 ### 3. Installation
@@ -36,6 +45,7 @@ AI-powered email subscription tracker that monitors Gmail, detects subscriptions
      cp .env.example .env
      ```
    - Open `.env` and paste your `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+   - Ensure `OAUTH_REDIRECT_URI` is set to `http://localhost:8000/api/auth/google/callback`.
 
 ### 4. Run the App
 
