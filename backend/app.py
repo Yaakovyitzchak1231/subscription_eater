@@ -11,9 +11,9 @@ from sqlalchemy.orm import Session
 from .config import get_settings
 from .database import Base, engine, get_db
 from .gmail_sync import shutdown_scheduler, start_scheduler, subscription_summary, sync_all_accounts
-from .models import Account
+from .models import Account, Subscription
 from .oauth import exchange_code_for_credentials, generate_authorization_url
-from .schemas import AccountResponse, AccountSummary, AuthorizationUrlResponse, SubscriptionEntry
+from .schemas import AccountResponse, AccountSummary, AuthorizationUrlResponse, SubscriptionEntry, SubscriptionResponse
 
 settings = get_settings()
 
@@ -107,6 +107,23 @@ def list_accounts(db: Session = Depends(get_db)):
         for row in summary_rows
     ]
     return AccountSummary(accounts=accounts, subscription_entries=subscription_entries)
+
+
+@app.get("/api/subscriptions", response_model=List[SubscriptionResponse])
+def list_subscriptions(db: Session = Depends(get_db)):
+    subs = db.query(Subscription).join(Account).all()
+
+    # Enrich with metadata that isn't directly on Subscription model (via relationships)
+    response = []
+    for sub in subs:
+        resp = SubscriptionResponse.from_orm(sub)
+        resp.account_email = sub.account.email
+        if sub.source_email:
+            resp.source_email_subject = sub.source_email.subject
+            resp.source_email_from = sub.source_email.from_address
+        response.append(resp)
+
+    return response
 
 
 @app.post("/api/sync", status_code=202)
