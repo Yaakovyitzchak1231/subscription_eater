@@ -515,7 +515,7 @@
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2 style="margin-top: 0; margin-bottom: 0;">Subscription Eater</h2>
-                    <button id="theme-toggle" class="btn-sm btn-secondary" onclick="toggleTheme()">🌙</button>
+                    <button id="theme-toggle" class="btn-sm btn-secondary" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
                 </div>
                 <p style="margin: 8px 0 16px 0; font-size: 13px; color: var(--color-text-secondary);">AI-powered subscription tracker for your inbox.</p>
             </div>
@@ -559,7 +559,9 @@
             <!-- Removed Manual Test Section since we rely on backend parsing now -->
             <div class="card setup-section">
                 <h3 style="margin-top: 0;">Actions</h3>
-                <button class="btn-secondary" onclick="fetchSubscriptions()" style="width: 100%;">Refresh Data</button>
+                <button id="refresh-btn" class="btn-secondary" onclick="fetchSubscriptions('refresh-btn')" style="width: 100%;">
+                    <span>Refresh Data</span>
+                </button>
             </div>
         </div>
 
@@ -723,7 +725,20 @@
             }
         }
 
-        async function fetchSubscriptions() {
+        async function fetchSubscriptions(btnId = null) {
+            let btn = null;
+            let originalContent = '';
+
+            if (btnId) {
+                btn = document.getElementById(btnId);
+                if (btn) {
+                    originalContent = btn.innerHTML;
+                    btn.disabled = true;
+                    // Add spinner
+                    btn.innerHTML = `<span class="loading" style="border-top-color: currentColor; width: 14px; height: 14px; margin-right: 8px;"></span>Refreshing...`;
+                }
+            }
+
             try {
                 const response = await fetch(BACKEND_URL + '/subscriptions');
                 if (response.ok) {
@@ -732,6 +747,14 @@
                 }
             } catch (e) {
                 console.error("Failed to fetch subscriptions", e);
+            } finally {
+                if (btn) {
+                    // Small delay to make sure user sees the action if it's too fast
+                    setTimeout(() => {
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                    }, 500);
+                }
             }
         }
 
@@ -939,43 +962,12 @@ Subject: ${sub.source_email_subject}
 Confidence: ${(sub.confidence_score * 100).toFixed(0)}%
                         </div>
                     </div>
-                    <input type="text" id="edit-service">
                 </div>
-                <div class="form-group">
-                    <label>Cost</label>
-                    <input type="text" id="edit-cost">
-                </div>
-                <div class="form-group">
-                    <label>Billing Cycle</label>
-                    <select id="edit-cycle">
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Confidence</label>
-                    <input type="text" id="display-confidence" disabled style="background: var(--color-bg);">
-                </div>
-                 <div class="form-group">
-                    <label>Email Source</label>
-                    <div style="font-size: 12px; color: var(--color-text-secondary); padding: 8px; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-bg);">
-                        <strong>From:</strong> <span id="display-from"></span><br>
-                        <strong>Subject:</strong> <span id="display-subject"></span>
-                    </div>
-                </div>
-                <div style="margin-top: 24px; display: flex; justify-content: space-between;">
+
+                <div style="margin-top: 24px; display: flex; justify-content: flex-start;">
                     <button class="btn-danger" onclick="deleteSubscription(${sub.id})">Delete / Hide</button>
-                    <button class="btn-primary" onclick="saveSubscription(${sub.id})">Save Changes</button>
                 </div>
             `;
-
-            // Safely assign values
-            document.getElementById('edit-service').value = sub.service_name || '';
-            document.getElementById('edit-cost').value = sub.cost || 0;
-            document.getElementById('edit-cycle').value = sub.billing_cycle || 'monthly';
-            document.getElementById('display-confidence').value = (sub.confidence_score * 100).toFixed(0) + '%';
-            document.getElementById('display-from').textContent = sub.source_email_from || '';
-            document.getElementById('display-subject').textContent = sub.source_email_subject || '';
             modal.classList.add('active');
         }
 
@@ -1020,35 +1012,6 @@ Confidence: ${(sub.confidence_score * 100).toFixed(0)}%
             } finally {
                 saveBtn.textContent = originalText;
                 saveBtn.disabled = false;
-        async function saveSubscription(id) {
-            const serviceName = document.getElementById('edit-service').value;
-            const cost = parseFloat(document.getElementById('edit-cost').value);
-            const cycle = document.getElementById('edit-cycle').value;
-
-            if (!serviceName) return alert("Service name required");
-            if (isNaN(cost)) return alert("Invalid cost");
-
-            try {
-                const response = await fetch(BACKEND_URL + `/subscriptions/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        service_name: serviceName,
-                        cost: cost,
-                        billing_cycle: cycle
-                    })
-                });
-
-                if (response.ok) {
-                    alert("Saved successfully!");
-                    closeModal();
-                    fetchSubscriptions();
-                } else {
-                    alert("Error saving");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("Error saving: " + e.message);
             }
         }
 
