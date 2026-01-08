@@ -29,12 +29,10 @@ Follow these steps to enable real Gmail integration in Subscription Eater.
 4. Back in Credentials, click **+ CREATE CREDENTIALS** > **OAuth client ID**
 5. Choose **Web application**
 6. Under **Authorized JavaScript origins**, add:
-   - `http://localhost:3000`
    - `http://localhost:8000`
    - Your actual domain (if hosting online)
 7. Under **Authorized redirect URIs**, add:
-   - `http://localhost:3000`
-   - `http://localhost:8000`
+   - `http://localhost:8000/auth/google/callback`
 8. Click **CREATE**
 9. Copy the **Client ID** (looks like: `xxxxx.apps.googleusercontent.com`)
 10. Copy the **Client Secret**
@@ -106,9 +104,9 @@ Then open: `http://localhost:3000`
 ## Security Notes
 
 ⚠️ This app requests **read-only** access (`gmail.readonly`)  
-⚠️ Tokens are stored in browser `localStorage` only  
-⚠️ No server backend = no data leaves your device  
-⚠️ For production, consider adding a backend to rotate tokens safely
+⚠️ Tokens are stored in the backend database (access_token and refresh_token columns in Account table)  
+⚠️ This app uses a FastAPI backend, so OAuth tokens and Gmail metadata are sent to and processed on that server  
+⚠️ For production, ensure the backend is properly secured (HTTPS, access controls) and that tokens are stored and rotated safely
 
 ## Limitations
 

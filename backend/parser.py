@@ -44,6 +44,9 @@ class SubscriptionParser:
         "Health": ["gym", "fitness", "yoga", "meditation", "health", "insurance", "medical"],
         "Food": ["uber eats", "doordash", "grubhub", "hellofresh", "blue apron", "instacart"]
     }
+    
+    # Valid categories for validation
+    VALID_CATEGORIES = set(CATEGORY_KEYWORDS.keys()) | {"Other"}
 
     def parse_email(self, subject: str, body: str, sender: str) -> Optional[Dict[str, Any]]:
         """
@@ -67,7 +70,7 @@ class SubscriptionParser:
             "billing_cycle": cycle,
             "category": category,
             "confidence_score": confidence,
-            "status": "active" # Default assumption for found receipts
+            "status": "active"  # Default assumption for found receipts
         }
 
     def _calculate_confidence(self, subject: str, body: str, sender: str) -> float:
@@ -162,11 +165,9 @@ class SubscriptionParser:
                 if re.search(pattern, text):
                     return cycle_name
 
-        return "monthly" # Default fallback? Or None?
+        return "monthly"  # Default fallback? Or None?
 
     def _extract_category(self, service_name: str, subject: str, body: str) -> str:
-        text = (service_name + " " + subject + " " + body).lower()
-
         # Check service name first (higher priority)
         service_lower = service_name.lower()
         for category, keywords in self.CATEGORY_KEYWORDS.items():
@@ -174,6 +175,7 @@ class SubscriptionParser:
                 return category
 
         # Then check subject/body
+        text = (service_name + " " + subject + " " + body).lower()
         for category, keywords in self.CATEGORY_KEYWORDS.items():
             if any(k in text for k in keywords):
                 return category
