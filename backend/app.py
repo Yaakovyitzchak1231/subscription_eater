@@ -217,6 +217,7 @@ def delete_subscription(subscription_id: int, db: Session = Depends(get_db)):
     sub.is_hidden = True
     sub.status = "deleted"
     db.commit()
+    return
 
 
 @app.post("/api/sync", status_code=202)
