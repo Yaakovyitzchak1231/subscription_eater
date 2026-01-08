@@ -68,6 +68,12 @@ class SubscriptionUpdate(BaseModel):
     cost: Optional[float] = None
     currency: Optional[str] = None
     billing_cycle: Optional[str] = None
-    category: Optional[str] = None
-    status: Optional[str] = None
-    renewal_date: Optional[str] = None  # Accepts ISO format string or None
+    category: Optional[str] = Field(
+        None, 
+        description="Category of subscription. Valid values: Entertainment, Software, Utilities, Shopping, News, Health, Food, Other"
+    )
+    status: Optional[str] = Field(
+        None,
+        description="Status of subscription. Valid values: active, cancelled, detected"
+    )
+    renewal_date: Optional[str] = Field(None, description="ISO 8601 format date string")

@@ -137,7 +137,7 @@ def _upsert_message(
                 category=parsed_data.get("category", "Other"),
                 status=parsed_data["status"],
                 confidence_score=parsed_data["confidence_score"],
-                renewal_date=internal_date # Rough guess: renewal is around the email date
+                renewal_date=internal_date  # Rough guess: renewal is around the email date
             )
             db.add(sub)
 

@@ -15,7 +15,6 @@ from .gmail_sync import shutdown_scheduler, start_scheduler, subscription_summar
 from .models import Account, Subscription
 from .oauth import exchange_code_for_credentials, generate_authorization_url
 from .schemas import (
-    AccountResponse,
     AccountSummary,
     AuthorizationUrlResponse,
     SubscriptionEntry,
@@ -38,21 +37,28 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup() -> None:
-    # Migrate database if needed
+    # Create tables first
+    Base.metadata.create_all(bind=engine)
+    
+    # Then migrate existing tables if needed
     from sqlalchemy import inspect, text
     inspector = inspect(engine)
     if "subscriptions" in inspector.get_table_names():
         columns = [c["name"] for c in inspector.get_columns("subscriptions")]
         with engine.connect() as conn:
-            if "manually_edited" not in columns:
-                conn.execute(text("ALTER TABLE subscriptions ADD COLUMN manually_edited BOOLEAN DEFAULT FALSE"))
-            if "is_hidden" not in columns:
-                conn.execute(text("ALTER TABLE subscriptions ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE"))
-            if "category" not in columns:
-                conn.execute(text("ALTER TABLE subscriptions ADD COLUMN category TEXT"))
-            conn.commit()
+            try:
+                if "manually_edited" not in columns:
+                    conn.execute(text("ALTER TABLE subscriptions ADD COLUMN manually_edited BOOLEAN DEFAULT FALSE"))
+                if "is_hidden" not in columns:
+                    conn.execute(text("ALTER TABLE subscriptions ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE"))
+                if "category" not in columns:
+                    conn.execute(text("ALTER TABLE subscriptions ADD COLUMN category TEXT"))
+                conn.commit()
+            except Exception as e:
+                # Log error but don't prevent startup
+                print(f"Migration warning: {e}")
+                conn.rollback()
 
-    Base.metadata.create_all(bind=engine)
     start_scheduler()
 
 
@@ -133,7 +139,7 @@ def list_accounts(db: Session = Depends(get_db)):
 
 @app.get("/api/subscriptions", response_model=List[SubscriptionResponse])
 def list_subscriptions(db: Session = Depends(get_db)):
-    subs = db.query(Subscription).join(Account).filter(Subscription.is_hidden == False).all()
+    subs = db.query(Subscription).join(Account).filter(Subscription.is_hidden.is_(False)).all()
 
     # Enrich with metadata that isn't directly on Subscription model (via relationships)
     response = []
@@ -162,10 +168,24 @@ def update_subscription(subscription_id: int, update_data: SubscriptionUpdate, d
     if update_data.billing_cycle is not None:
         sub.billing_cycle = update_data.billing_cycle
     if update_data.category is not None:
+        # Validate category
+        valid_categories = {"Entertainment", "Software", "Utilities", "Shopping", "News", "Health", "Food", "Other"}
+        if update_data.category not in valid_categories:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid category. Allowed values are: {', '.join(sorted(valid_categories))}."
+            )
         sub.category = update_data.category
     if update_data.status is not None:
+        # Validate status (exclude "deleted" which should only be set via DELETE endpoint)
+        allowed_statuses = {"active", "cancelled", "detected"}
+        if update_data.status not in allowed_statuses:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid status. Allowed values are: {', '.join(sorted(allowed_statuses))}."
+            )
         sub.status = update_data.status
-    if update_data.renewal_date is not None:
+    if update_data.renewal_date is not None and update_data.renewal_date:
         try:
             sub.renewal_date = date_parser.isoparse(update_data.renewal_date)
         except (ValueError, TypeError):
@@ -197,7 +217,6 @@ def delete_subscription(subscription_id: int, db: Session = Depends(get_db)):
     sub.is_hidden = True
     sub.status = "deleted"
     db.commit()
-    return
 
 
 @app.post("/api/sync", status_code=202)

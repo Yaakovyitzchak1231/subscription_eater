@@ -74,4 +74,7 @@ Create a `.env` file (or export variables) with the following values:
 - `GET /auth/google/start` – Returns an authorization URL and state for OAuth 2.0 authorization_code flow (offline access + refresh tokens).
 - `GET /auth/google/callback` – Handles Google's redirect, exchanges the code for tokens, and stores/updates the account.
 - `GET /accounts` – Lists all connected accounts with their last sync time and aggregated subscription entries grouped by sender.
+- `GET /api/subscriptions` – Returns the list of detected subscriptions for the authenticated/selected account.
+- `PUT /api/subscriptions/{subscription_id}` – Updates a specific subscription (for example, marking it as cancelled or updating metadata).
+- `DELETE /api/subscriptions/{subscription_id}` – Deletes or archives a specific subscription record.
 - `POST /sync` – Manually trigger a sync for all accounts (the scheduler also runs automatically based on `SYNC_INTERVAL_MINUTES`).
