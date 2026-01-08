@@ -34,12 +34,23 @@ This application uses a **FastAPI backend** (Python) to handle OAuth and data pr
 
 ### 3. Installation
 
-1. Clone the repo and install dependencies:
+1. Clone the repo.
+
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   # On macOS/Linux:
+   source .venv/bin/activate
+   # On Windows (PowerShell):
+   .venv\Scripts\Activate.ps1
+   ```
+
+3. Install dependencies:
    ```bash
    pip install -r backend/requirements.txt
    ```
 
-2. Configuration:
+4. Configuration:
    - Copy `.env.example` to `.env`:
      ```bash
      cp .env.example .env
@@ -60,4 +71,4 @@ Open your browser to:
 ### 5. Usage
 1. Click **Sign in with Google** on the dashboard.
 2. Grant the requested permissions.
-3. The app will sync your emails in the background (looking for receipts/invoices) and populate the dashboard with live data.
+3. The app will sync your emails in the background (looking for subscription-related emails such as those containing "unsubscribe", "subscription", "receipt", or "billing") and populate the dashboard with live data.
