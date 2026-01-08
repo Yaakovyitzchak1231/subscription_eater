@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import List
 import os
 
+from dateutil import parser as date_parser
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
@@ -13,9 +14,14 @@ from .database import Base, engine, get_db
 from .gmail_sync import shutdown_scheduler, start_scheduler, subscription_summary, sync_all_accounts
 from .models import Account, Subscription
 from .oauth import exchange_code_for_credentials, generate_authorization_url
-from .schemas import AccountResponse, AccountSummary, AuthorizationUrlResponse, SubscriptionEntry, SubscriptionResponse
-from .update_schema import SubscriptionUpdate
-from .schemas import AccountResponse, AccountSummary, AuthorizationUrlResponse, SubscriptionEntry, SubscriptionResponse, SubscriptionUpdate
+from .parser import SubscriptionParser
+from .schemas import (
+    AccountSummary,
+    AuthorizationUrlResponse,
+    SubscriptionEntry,
+    SubscriptionResponse,
+    SubscriptionUpdate,
+)
 
 settings = get_settings()
 
@@ -32,19 +38,28 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup() -> None:
-    # Migrate database if needed
+    # Create tables first
+    Base.metadata.create_all(bind=engine)
+    
+    # Then migrate existing tables if needed
     from sqlalchemy import inspect, text
     inspector = inspect(engine)
     if "subscriptions" in inspector.get_table_names():
         columns = [c["name"] for c in inspector.get_columns("subscriptions")]
         with engine.connect() as conn:
-            if "manually_edited" not in columns:
-                conn.execute(text("ALTER TABLE subscriptions ADD COLUMN manually_edited BOOLEAN DEFAULT FALSE"))
-            if "is_hidden" not in columns:
-                conn.execute(text("ALTER TABLE subscriptions ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE"))
-            conn.commit()
+            try:
+                if "manually_edited" not in columns:
+                    conn.execute(text("ALTER TABLE subscriptions ADD COLUMN manually_edited BOOLEAN DEFAULT FALSE"))
+                if "is_hidden" not in columns:
+                    conn.execute(text("ALTER TABLE subscriptions ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE"))
+                if "category" not in columns:
+                    conn.execute(text("ALTER TABLE subscriptions ADD COLUMN category TEXT"))
+                conn.commit()
+            except Exception as e:
+                # Log error but don't prevent startup
+                print(f"Migration warning: {e}")
+                conn.rollback()
 
-    Base.metadata.create_all(bind=engine)
     start_scheduler()
 
 
@@ -125,7 +140,7 @@ def list_accounts(db: Session = Depends(get_db)):
 
 @app.get("/api/subscriptions", response_model=List[SubscriptionResponse])
 def list_subscriptions(db: Session = Depends(get_db)):
-    subs = db.query(Subscription).join(Account).filter(Subscription.is_hidden == False).all()
+    subs = db.query(Subscription).join(Account).filter(Subscription.is_hidden.is_(False)).all()
 
     # Enrich with metadata that isn't directly on Subscription model (via relationships)
     response = []
@@ -141,18 +156,40 @@ def list_subscriptions(db: Session = Depends(get_db)):
 
 
 @app.put("/api/subscriptions/{subscription_id}", response_model=SubscriptionResponse)
-def update_subscription(subscription_id: int, update: SubscriptionUpdate, db: Session = Depends(get_db)):
+def update_subscription(subscription_id: int, update_data: SubscriptionUpdate, db: Session = Depends(get_db)):
     sub = db.query(Subscription).filter(Subscription.id == subscription_id).one_or_none()
     if not sub:
         raise HTTPException(status_code=404, detail="Subscription not found")
 
     # Update fields if provided
-    update_data = update.dict(exclude_unset=True)
-    if not update_data:
-        return sub
-
-    for key, value in update_data.items():
-        setattr(sub, key, value)
+    if update_data.cost is not None:
+        sub.cost = update_data.cost
+    if update_data.currency is not None:
+        sub.currency = update_data.currency
+    if update_data.billing_cycle is not None:
+        sub.billing_cycle = update_data.billing_cycle
+    if update_data.category is not None:
+        # Validate category using shared constant
+        if update_data.category not in SubscriptionParser.VALID_CATEGORIES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid category. Allowed values are: {', '.join(sorted(SubscriptionParser.VALID_CATEGORIES))}."
+            )
+        sub.category = update_data.category
+    if update_data.status is not None:
+        # Validate status (exclude "deleted" which should only be set via DELETE endpoint)
+        allowed_statuses = {"active", "cancelled", "detected"}
+        if update_data.status not in allowed_statuses:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid status. Allowed values are: {', '.join(sorted(allowed_statuses))}."
+            )
+        sub.status = update_data.status
+    if update_data.renewal_date:
+        try:
+            sub.renewal_date = date_parser.isoparse(update_data.renewal_date)
+        except (ValueError, TypeError):
+            raise HTTPException(status_code=400, detail="Invalid date format. Expected ISO 8601.")
 
     # Mark as manually edited so parser doesn't overwrite it
     sub.manually_edited = True
@@ -187,39 +224,6 @@ def delete_subscription(subscription_id: int, db: Session = Depends(get_db)):
 def trigger_sync():
     sync_all_accounts()
     return {"status": "sync-started"}
-
-
-@app.put("/api/subscriptions/{subscription_id}", response_model=SubscriptionResponse)
-def update_subscription(subscription_id: int, update_data: SubscriptionUpdate, db: Session = Depends(get_db)):
-    sub = db.query(Subscription).filter(Subscription.id == subscription_id).one_or_none()
-    if not sub:
-        raise HTTPException(status_code=404, detail="Subscription not found")
-
-    if update_data.cost is not None:
-        sub.cost = update_data.cost
-    if update_data.currency is not None:
-        sub.currency = update_data.currency
-    if update_data.billing_cycle is not None:
-        sub.billing_cycle = update_data.billing_cycle
-    if update_data.category is not None:
-        sub.category = update_data.category
-    if update_data.status is not None:
-        sub.status = update_data.status
-    if update_data.renewal_date is not None:
-        try:
-            sub.renewal_date = datetime.fromisoformat(update_data.renewal_date.replace('Z', '+00:00'))
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid date format. Expected ISO 8601.")
-
-    db.commit()
-    db.refresh(sub)
-
-    resp = SubscriptionResponse.from_orm(sub)
-    resp.account_email = sub.account.email
-    if sub.source_email:
-        resp.source_email_subject = sub.source_email.subject
-        resp.source_email_from = sub.source_email.from_address
-    return resp
 
 
 # Serve dashboard HTML for root path
