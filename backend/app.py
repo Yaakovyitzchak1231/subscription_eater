@@ -14,6 +14,7 @@ from .database import Base, engine, get_db
 from .gmail_sync import shutdown_scheduler, start_scheduler, subscription_summary, sync_all_accounts
 from .models import Account, Subscription
 from .oauth import exchange_code_for_credentials, generate_authorization_url
+from .parser import SubscriptionParser
 from .schemas import (
     AccountSummary,
     AuthorizationUrlResponse,
@@ -168,12 +169,11 @@ def update_subscription(subscription_id: int, update_data: SubscriptionUpdate, d
     if update_data.billing_cycle is not None:
         sub.billing_cycle = update_data.billing_cycle
     if update_data.category is not None:
-        # Validate category
-        valid_categories = {"Entertainment", "Software", "Utilities", "Shopping", "News", "Health", "Food", "Other"}
-        if update_data.category not in valid_categories:
+        # Validate category using shared constant
+        if update_data.category not in SubscriptionParser.VALID_CATEGORIES:
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid category. Allowed values are: {', '.join(sorted(valid_categories))}."
+                detail=f"Invalid category. Allowed values are: {', '.join(sorted(SubscriptionParser.VALID_CATEGORIES))}."
             )
         sub.category = update_data.category
     if update_data.status is not None:
@@ -185,7 +185,7 @@ def update_subscription(subscription_id: int, update_data: SubscriptionUpdate, d
                 detail=f"Invalid status. Allowed values are: {', '.join(sorted(allowed_statuses))}."
             )
         sub.status = update_data.status
-    if update_data.renewal_date is not None and update_data.renewal_date:
+    if update_data.renewal_date:
         try:
             sub.renewal_date = date_parser.isoparse(update_data.renewal_date)
         except (ValueError, TypeError):

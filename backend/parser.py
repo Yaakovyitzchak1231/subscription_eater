@@ -44,6 +44,9 @@ class SubscriptionParser:
         "Health": ["gym", "fitness", "yoga", "meditation", "health", "insurance", "medical"],
         "Food": ["uber eats", "doordash", "grubhub", "hellofresh", "blue apron", "instacart"]
     }
+    
+    # Valid categories for validation
+    VALID_CATEGORIES = set(CATEGORY_KEYWORDS.keys()) | {"Other"}
 
     def parse_email(self, subject: str, body: str, sender: str) -> Optional[Dict[str, Any]]:
         """
