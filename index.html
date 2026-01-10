@@ -565,21 +565,21 @@
 
         <div class="main-content">
             <div class="card">
-                <div class="tabs">
-                    <button class="tab active" onclick="switchTab('active')">Active Subscriptions</button>
-                    <button class="tab" onclick="switchTab('cancelled')">Cancelled</button>
-                    <button class="tab" onclick="switchTab('detected')">Detected</button>
+                <div class="tabs" role="tablist">
+                    <button id="tab-active" role="tab" aria-selected="true" aria-controls="active" class="tab active" onclick="switchTab('active')">Active Subscriptions</button>
+                    <button id="tab-cancelled" role="tab" aria-selected="false" aria-controls="cancelled" class="tab" onclick="switchTab('cancelled')">Cancelled</button>
+                    <button id="tab-detected" role="tab" aria-selected="false" aria-controls="detected" class="tab" onclick="switchTab('detected')">Detected</button>
                 </div>
 
-                <div id="active" class="tab-content active">
+                <div id="active" role="tabpanel" aria-labelledby="tab-active" class="tab-content active">
                     <div id="active-list" class="subscriptions-list"></div>
                 </div>
 
-                <div id="cancelled" class="tab-content">
+                <div id="cancelled" role="tabpanel" aria-labelledby="tab-cancelled" class="tab-content">
                     <div id="cancelled-list" class="subscriptions-list"></div>
                 </div>
 
-                <div id="detected" class="tab-content">
+                <div id="detected" role="tabpanel" aria-labelledby="tab-detected" class="tab-content">
                     <div id="detected-list" class="subscriptions-list"></div>
                 </div>
             </div>
@@ -737,12 +737,16 @@
 
         function switchTab(tab) {
             currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-            // Find tab button that calls this function (rough, but works)
-            event.target.classList.add('active');
-            document.getElementById(tab).classList.add('active');
+            document.querySelectorAll('.tab').forEach(t => {
+                const isActive = t.getAttribute('aria-controls') === tab;
+                t.classList.toggle('active', isActive);
+                t.setAttribute('aria-selected', isActive);
+            });
+
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.toggle('active', c.id === tab);
+            });
 
             renderAll();
         }
@@ -1020,35 +1024,6 @@ Confidence: ${(sub.confidence_score * 100).toFixed(0)}%
             } finally {
                 saveBtn.textContent = originalText;
                 saveBtn.disabled = false;
-        async function saveSubscription(id) {
-            const serviceName = document.getElementById('edit-service').value;
-            const cost = parseFloat(document.getElementById('edit-cost').value);
-            const cycle = document.getElementById('edit-cycle').value;
-
-            if (!serviceName) return alert("Service name required");
-            if (isNaN(cost)) return alert("Invalid cost");
-
-            try {
-                const response = await fetch(BACKEND_URL + `/subscriptions/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        service_name: serviceName,
-                        cost: cost,
-                        billing_cycle: cycle
-                    })
-                });
-
-                if (response.ok) {
-                    alert("Saved successfully!");
-                    closeModal();
-                    fetchSubscriptions();
-                } else {
-                    alert("Error saving");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("Error saving: " + e.message);
             }
         }
 
