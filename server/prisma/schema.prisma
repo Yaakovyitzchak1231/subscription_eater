@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(uuid())
+  email          String          @unique
+  password       String
+  googleAccounts GoogleAccount[]
+  subscriptions  Subscription[]
+  blacklist      Blacklist[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model GoogleAccount {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  email        String
+  accessToken  String
+  refreshToken String?
+  expiryDate   BigInt?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, email])
+}
+
+model Subscription {
+
+  id                  String   @id @default(uuid())
+
+  user                User     @relation(fields: [userId], references: [id])
+
+  userId              String
+
+  name                String
+
+  provider            String
+
+  amount              Float?
+
+  currency            String   @default("USD")
+
+  billingCycle        String?  // monthly, yearly
+
+  nextPaymentDate     DateTime?
+
+  trialExpirationDate DateTime?
+
+  status              String   @default("active") // active, trial, cancelled
+
+  category            String?
+
+  emailThreadId       String?
+
+  sourceEmail         String?  // Which google account found this
+
+  emailSubject        String?  // For preview
+
+  emailSnippet        String?  // For preview
+
+  emailBody           String?  // Full content (truncated if needed)
+
+  payments            Payment[]
+
+  createdAt           DateTime @default(now())
+
+  updatedAt           DateTime @updatedAt
+
+}
+
+
+
+model Blacklist {
+
+  id        String   @id @default(uuid())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  userId    String
+
+  term      String   // Sender email or Subject keyword
+
+  type      String   // "sender" or "subject"
+
+  createdAt DateTime @default(now())
+
+}
+
+
+
+model Payment {
+
+  id             String   @id @default(uuid())
+
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+
+  subscriptionId String
+
+  amount         Float
+
+  date           DateTime
+
+  status         String   @default("paid")
+
+}

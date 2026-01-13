@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Agent Cancellation in Progress</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2bee79",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#102217",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            min-height: 100dvh;
+        }
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .animate-scanline {
+            animation: scanline 3s linear infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark text-white font-display h-screen flex flex-col overflow-hidden">
+<div class="sticky top-0 z-10 bg-[#112218] border-b border-[#193324] px-4 py-3 flex items-center justify-between shrink-0 shadow-md">
+<div class="flex flex-col">
+<h2 class="text-white text-base font-bold leading-tight">AI Agent Active</h2>
+<p class="text-[#92c9a8] text-xs font-medium">Canceling Netflix Premium...</p>
+</div>
+<div class="flex items-center gap-2 bg-[#193324] pl-2 pr-3 py-1 rounded-full border border-[#234832]">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+</span>
+<span class="text-[10px] text-primary font-bold uppercase tracking-wider">Live View</span>
+</div>
+</div>
+<div class="px-5 py-4 shrink-0 bg-background-dark">
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs font-medium text-[#92c9a8] uppercase tracking-wider">Progress</span>
+<span class="text-sm font-bold text-white">Step 3/4</span>
+</div>
+<div class="h-1.5 w-full bg-[#193324] rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4 rounded-full shadow-[0_0_12px_rgba(43,238,121,0.6)] relative overflow-hidden">
+<div class="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite] -skew-x-12 translate-x-[-100%]"></div>
+</div>
+</div>
+</div>
+<div class="flex-1 px-4 flex flex-col min-h-0 relative">
+<div class="bg-[#2a2a2a] rounded-t-xl p-2.5 flex items-center gap-3 border border-b-0 border-[#404040] shadow-xl relative z-10">
+<div class="flex gap-1.5 ml-1">
+<div class="w-2.5 h-2.5 rounded-full bg-[#ff5f57] border border-[#e0443e]"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-[#febc2e] border border-[#d89e24]"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-[#28c840] border border-[#1aab29]"></div>
+</div>
+<div class="flex-1 bg-[#1a1a1a] rounded text-[11px] text-[#9ca3af] px-3 py-1 text-center font-mono flex items-center justify-center gap-1.5 mx-2 border border-[#333]">
+<span class="material-symbols-outlined text-[12px] text-[#2bee79]">lock</span>
+                netflix.com/youraccount
+            </div>
+<span class="material-symbols-outlined text-[#9ca3af] text-[16px]">refresh</span>
+</div>
+<div class="bg-white text-black relative flex-1 rounded-b-xl overflow-hidden border border-[#404040] shadow-2xl">
+<div class="absolute inset-0 pointer-events-none z-10 bg-blue-500/5"></div>
+<div class="absolute z-30 top-[65%] left-[55%] transition-all duration-700 ease-in-out drop-shadow-2xl">
+<svg class="w-8 h-8 text-black fill-current stroke-white stroke-2" viewBox="0 0 24 24"><path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2.9-3.2-7.4-4.4 4V2z"></path></svg>
+<div class="ml-5 mt-1 bg-primary text-[#102217] text-[10px] font-bold px-2 py-0.5 rounded shadow-lg border border-[#102217]/20 whitespace-nowrap flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]">smart_toy</span>
+                    Clicking...
+                </div>
+</div>
+<div class="h-full flex flex-col bg-[#f3f3f3]">
+<div class="h-12 bg-black flex items-center px-4 justify-between shrink-0">
+<div class="text-[#e50914] font-bold text-lg tracking-tighter">NETFLIX</div>
+<div class="w-6 h-6 bg-blue-500 rounded text-xs text-white flex items-center justify-center">:)</div>
+</div>
+<div class="p-4 overflow-hidden relative">
+<h1 class="text-xl font-medium text-[#333] mb-4">Account</h1>
+<div class="bg-white border border-[#e6e6e6] rounded shadow-sm mb-4">
+<div class="p-3 border-b border-[#e6e6e6] flex justify-between items-center">
+<span class="text-sm text-[#737373] font-medium uppercase">Membership &amp; Billing</span>
+<button class="bg-[#e6e6e6] text-black text-xs font-semibold px-3 py-1.5 rounded shadow-sm">Cancel Membership</button>
+</div>
+<div class="p-3">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+<div class="h-2 w-32 bg-gray-200 rounded"></div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+<div class="h-2 w-24 bg-gray-200 rounded"></div>
+</div>
+</div>
+</div>
+<div class="bg-white border border-[#e6e6e6] rounded shadow-sm p-4 relative overflow-hidden">
+<div class="flex justify-between items-center mb-3">
+<span class="text-sm text-[#737373] font-medium uppercase">Settings</span>
+</div>
+<div class="relative group">
+<div class="absolute -inset-2 bg-blue-500/20 rounded-lg animate-pulse border border-blue-500/50"></div>
+<div class="w-full bg-[#e6e6e6] hover:bg-[#d6d6d6] text-black text-center py-2.5 rounded font-medium text-sm border border-[#ccc]">
+                                Cancel Membership
+                            </div>
+</div>
+<div class="mt-3 h-2 w-full bg-gray-100 rounded"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-4 pt-4 pb-2 shrink-0 h-[35vh] flex flex-col">
+<div class="flex items-center justify-between mb-2 px-1">
+<div class="text-[#92c9a8] text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">terminal</span>
+                Agent Log
+            </div>
+<div class="text-[10px] text-white/50 bg-[#193324] px-1.5 py-0.5 rounded font-mono">ID: #AI-992-CNX</div>
+</div>
+<div class="bg-[#0c100e] border border-[#193324] rounded-xl p-4 font-mono text-xs flex-1 overflow-hidden relative shadow-inner flex flex-col">
+<div class="flex flex-col gap-2 justify-end h-full pb-1">
+<div class="text-gray-500 flex gap-2">
+<span class="opacity-50">[10:42:01]</span>
+<span>Initializing headless browser...</span>
+</div>
+<div class="text-gray-400 flex gap-2">
+<span class="opacity-50">[10:42:04]</span>
+<span>Navigating to account settings...</span>
+<span class="text-green-500">OK</span>
+</div>
+<div class="text-gray-300 flex gap-2">
+<span class="opacity-50">[10:42:08]</span>
+<span>Analyzing page DOM structure...</span>
+</div>
+<div class="text-white flex gap-2 items-start bg-[#193324]/30 -mx-2 px-2 py-1 rounded">
+<span class="opacity-50 text-[#92c9a8] shrink-0">[10:42:12]</span>
+<span>Identified cancellation element: <span class="text-yellow-400">button#cancel-membership-action</span></span>
+</div>
+<div class="text-primary flex gap-2 items-center mt-1">
+<span class="material-symbols-outlined text-[14px] animate-spin">sync</span>
+<span>Executing cancellation click...</span>
+</div>
+</div>
+<div class="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]"></div>
+</div>
+</div>
+<div class="p-4 pt-2 bg-background-dark shrink-0">
+<button class="group w-full bg-[#2a1515] hover:bg-[#381a1a] active:bg-[#201010] border border-red-500/30 text-red-500 font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-lg shadow-red-900/10">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">hexagon</span>
+<span>Stop AI Agent</span>
+</button>
+</div>
+
+</body></html>

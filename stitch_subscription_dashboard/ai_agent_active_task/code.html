@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Agent Task</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;family=Roboto+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2bee79",
+              "background-light": "#f6f8f7",
+              "background-dark": "#102217",
+              "surface-dark": "#1c2e24",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"],
+              "mono": ["Roboto Mono", "monospace"],
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            animation: {
+                'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom scrollbar hiding for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased overflow-hidden h-screen flex flex-col">
+<!-- Top App Bar -->
+<div class="flex items-center px-4 py-4 justify-between shrink-0 z-30 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5">
+<button class="text-slate-900 dark:text-white flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">
+            Canceling Netflix
+        </h2>
+</div>
+<!-- Main Content Area - Scrollable -->
+<div class="flex-1 overflow-y-auto relative no-scrollbar pb-32">
+<!-- Agent Header & Progress -->
+<div class="flex flex-col items-center pt-8 pb-8 px-4 bg-gradient-to-b from-white to-background-light dark:from-background-dark dark:to-[#0d1a12] relative overflow-hidden">
+<!-- Decorative background glow -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-64 bg-primary/5 blur-3xl rounded-full pointer-events-none"></div>
+<!-- Avatar Ring -->
+<div class="relative mb-6 z-10">
+<!-- Ripple Effect -->
+<div class="absolute inset-0 rounded-full border border-primary/30 animate-ping opacity-20"></div>
+<div class="absolute inset-[-4px] rounded-full border border-primary/20 animate-pulse"></div>
+<div class="relative z-10 size-24 rounded-full p-1 bg-gradient-to-br from-primary via-[#1c2e24] to-background-dark shadow-2xl shadow-primary/10">
+<div class="size-full rounded-full bg-black flex items-center justify-center overflow-hidden relative group">
+<!-- Service Logo -->
+<div class="absolute inset-0 bg-cover bg-center opacity-60 transition-opacity group-hover:opacity-40" data-alt="Dark abstract background representing Netflix interface" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCVeJr6JEnawDjNfoc6SP4tw1REJKbyluVcFDHxKGLhEVbQrb7Ev608OOCn44dS_99TxII01UtrHDGJYiqulJCl7uqEvKegu-capOv1rI3Z3lLZIXBEtKUnWp2UkqSg4UBf6EIH0uBNd9VKaOCsBw_E17aCUo6FV1syeqTJBQ3ITQQvMN3H-qYoVU6Gpf9iUjkZ-WfeFfll3zfnHnepYcuvsDF3wDuWZxpFLSVdqANUVGFtzE-v9C-p7MJD9yqSlFBcI_5jpY6ZyMo');"></div>
+<div class="absolute inset-0 bg-black/40"></div>
+<!-- Agent Icon Overlay -->
+<span class="material-symbols-outlined text-primary text-4xl relative z-10 drop-shadow-[0_0_10px_rgba(43,238,121,0.8)] animate-pulse-fast">smart_toy</span>
+</div>
+</div>
+<!-- Status Badge -->
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-background-dark rounded-full p-1 border border-surface-dark shadow-lg z-20">
+<div class="bg-primary text-background-dark rounded-full px-2 py-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px] animate-spin">sync</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Active</span>
+</div>
+</div>
+</div>
+<!-- Header Text -->
+<div class="text-center mb-8 z-10">
+<h1 class="text-2xl font-bold mb-1 tracking-tight">Agent Active</h1>
+<p class="text-primary/90 text-sm font-medium animate-pulse flex items-center justify-center gap-2">
+<span class="size-1.5 rounded-full bg-primary inline-block"></span>
+                    Navigating to provider...
+                </p>
+</div>
+<!-- Stepper -->
+<div class="w-full max-w-sm flex items-start justify-between relative px-4 z-10">
+<!-- Line background -->
+<div class="absolute top-3.5 left-8 right-8 h-0.5 bg-gray-200 dark:bg-white/10 -z-0 rounded-full"></div>
+<!-- Line progress (approx 33% for step 2) -->
+<div class="absolute top-3.5 left-8 w-[30%] h-0.5 bg-primary -z-0 shadow-[0_0_8px_rgba(43,238,121,0.6)] rounded-full"></div>
+<!-- Step 1: Done -->
+<div class="flex flex-col items-center gap-2 z-10 group w-16">
+<div class="size-7 rounded-full bg-primary flex items-center justify-center text-background-dark shadow-lg shadow-primary/20 ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider text-center">Verify</span>
+</div>
+<!-- Step 2: Active -->
+<div class="flex flex-col items-center gap-2 z-10 group w-16">
+<div class="size-7 rounded-full bg-background-dark border-2 border-primary flex items-center justify-center text-primary shadow-[0_0_15px_rgba(43,238,121,0.4)] ring-4 ring-background-light dark:ring-background-dark relative">
+<span class="material-symbols-outlined text-sm">explore</span>
+<span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+</div>
+<span class="text-[10px] font-bold text-white uppercase tracking-wider text-center drop-shadow-md">Navigate</span>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex flex-col items-center gap-2 z-10 group w-16">
+<div class="size-7 rounded-full bg-surface-dark border-2 border-white/5 flex items-center justify-center text-gray-500 ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-sm">settings</span>
+</div>
+<span class="text-[10px] font-medium text-gray-600 dark:text-gray-500 uppercase tracking-wider text-center">Process</span>
+</div>
+<!-- Step 4: Pending -->
+<div class="flex flex-col items-center gap-2 z-10 group w-16">
+<div class="size-7 rounded-full bg-surface-dark border-2 border-white/5 flex items-center justify-center text-gray-500 ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-sm">verified</span>
+</div>
+<span class="text-[10px] font-medium text-gray-600 dark:text-gray-500 uppercase tracking-wider text-center">Confirm</span>
+</div>
+</div>
+</div>
+<!-- Terminal Log Section -->
+<div class="px-4 mt-2">
+<div class="flex items-center justify-between mb-3 px-1">
+<h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">terminal</span> System Log
+                </h3>
+<div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-surface-dark border border-white/5">
+<span class="size-1.5 rounded-full bg-primary animate-pulse"></span>
+<span class="text-[10px] font-mono text-primary/90">LIVE</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 relative">
+<!-- Fade out overlay for top of log -->
+<div class="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
+<!-- Log Item: Oldest -->
+<div class="flex items-start gap-3 p-3 rounded-lg border border-transparent bg-white/40 dark:bg-white/5 opacity-40 grayscale">
+<div class="mt-0.5 text-gray-400">
+<span class="material-symbols-outlined text-lg">vpn_key</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[10px] font-mono text-gray-500 mb-0.5 opacity-80">[10:01:22]</p>
+<p class="text-sm text-slate-700 dark:text-gray-300">Successfully authenticated credentials.</p>
+</div>
+</div>
+<!-- Log Item: Older -->
+<div class="flex items-start gap-3 p-3 rounded-lg border border-transparent bg-white/60 dark:bg-white/5 opacity-70">
+<div class="mt-0.5 text-primary">
+<span class="material-symbols-outlined text-lg">search</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[10px] font-mono text-gray-500 mb-0.5 opacity-80">[10:01:25]</p>
+<p class="text-sm text-slate-700 dark:text-gray-300">Located <span class="text-primary font-medium">"Cancel Subscription"</span> link.</p>
+</div>
+</div>
+<!-- Log Item: Recent -->
+<div class="flex items-start gap-3 p-3 rounded-lg bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/10 shadow-sm">
+<div class="mt-0.5 text-amber-400">
+<span class="material-symbols-outlined text-lg">warning</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[10px] font-mono text-gray-500 mb-0.5 opacity-80">[10:01:28]</p>
+<p class="text-sm text-slate-900 dark:text-white leading-tight">Bypassing "Are you sure?" retention modal...</p>
+</div>
+<div class="shrink-0 text-[10px] text-gray-400 font-mono">3s ago</div>
+</div>
+<!-- Log Item: Active (Pulse) -->
+<div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/30 relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary shadow-[0_0_10px_rgba(43,238,121,0.5)]"></div>
+<div class="mt-0.5 text-primary animate-pulse">
+<span class="material-symbols-outlined text-lg">query_stats</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[10px] font-mono text-primary/70 mb-0.5 opacity-90">[10:01:31]</p>
+<p class="text-sm text-slate-900 dark:text-white font-medium leading-tight">Analysing retention offer details...</p>
+</div>
+<div class="shrink-0 text-[10px] text-primary font-bold font-mono tracking-wide animate-pulse">NOW</div>
+</div>
+</div>
+</div>
+<!-- Chat / Interaction Area -->
+<div class="px-4 mt-8 mb-4">
+<div class="flex gap-3 items-end animate-fade-in-up">
+<div class="size-8 rounded-full bg-surface-dark border border-white/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-sm">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<span class="text-[10px] text-gray-400 ml-1">Agent • Just now</span>
+<div class="bg-white dark:bg-surface-dark p-4 rounded-2xl rounded-bl-none border border-gray-200 dark:border-white/10 shadow-sm relative">
+<p class="text-sm text-slate-700 dark:text-gray-200 leading-relaxed">
+                            I've navigated to the cancellation page, but they are offering a <span class="font-bold text-primary">50% discount</span> for the next 3 months to stay.
+                        </p>
+<p class="text-sm text-slate-700 dark:text-gray-200 mt-2 font-medium">
+                            Do you want me to accept this offer or proceed with cancellation?
+                        </p>
+</div>
+</div>
+</div>
+<!-- User Options -->
+<div class="flex gap-3 mt-5 pl-11 overflow-x-auto no-scrollbar pb-2">
+<button class="flex items-center gap-2 px-5 py-3 bg-primary text-background-dark rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 hover:scale-[1.02] transition-all whitespace-nowrap group">
+<span class="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">savings</span>
+<span>Keep &amp; Save 50%</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-3 bg-white dark:bg-surface-dark text-slate-900 dark:text-white rounded-xl text-sm font-medium border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 hover:border-white/20 transition-all whitespace-nowrap">
+<span>Proceed to Cancel</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Action -->
+<div class="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-gray-200 dark:border-white/5 z-20">
+<button class="w-full flex items-center justify-center gap-2 py-4 rounded-xl border border-red-500/30 bg-red-500/5 text-red-600 dark:text-red-400 font-bold text-base hover:bg-red-500/10 active:scale-[0.98] transition-all group">
+<span class="material-symbols-outlined group-hover:animate-pulse">stop_circle</span>
+            Stop Agent
+        </button>
+</div>
+</body></html>

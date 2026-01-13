@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trophy Room</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ecb613",
+                        "primary-dark": "#b38b0f",
+                        "background-light": "#f8f8f6",
+                        "background-dark": "#221d10",
+                        "card-dark": "#2c2616",
+                        "card-locked": "#1a160d",
+                        "text-muted": "#c9bb92",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                    backgroundImage: {
+                        'gold-gradient': 'linear-gradient(135deg, #ecb613 0%, #f7d264 50%, #b38b0f 100%)',
+                        'card-gradient': 'linear-gradient(180deg, rgba(236, 182, 19, 0.1) 0%, rgba(34, 29, 16, 0) 100%)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-locked {
+            font-variation-settings: 'FILL' 0, 'wght' 300;
+        }
+        /* Custom scrollbar hiding */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col text-white overflow-x-hidden selection:bg-primary selection:text-black">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50 bg-background-dark/95 backdrop-blur-sm border-b border-white/5">
+<div class="flex items-center p-4 pb-2 justify-between">
+<button class="text-white/80 hover:text-white flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 24px;">arrow_back</span>
+</button>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Trophy Room</h2>
+<button class="text-white/80 hover:text-white flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 24px;">share</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col gap-6 pb-8">
+<!-- Hero Section: Lifetime Savings -->
+<div class="relative flex flex-col items-center pt-8 px-4">
+<!-- Glow effect behind numbers -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/20 rounded-full blur-[64px] pointer-events-none"></div>
+<p class="text-text-muted text-sm font-medium tracking-wider uppercase mb-2">Lifetime Savings</p>
+<h1 class="text-white tracking-tight text-5xl font-extrabold leading-none text-center relative">
+<span class="text-transparent bg-clip-text bg-gold-gradient">$342.00</span>
+</h1>
+</div>
+<!-- Progress Bar Card -->
+<div class="px-4">
+<div class="bg-card-dark rounded-2xl p-5 border border-white/5 shadow-lg relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent opacity-50"></div>
+<div class="flex justify-between items-end mb-3 relative z-10">
+<div>
+<p class="text-text-muted text-xs font-semibold uppercase tracking-wide mb-1">Next Milestone</p>
+<p class="text-white text-lg font-bold">Savvy Saver Level 2</p>
+</div>
+<div class="text-right">
+<span class="material-symbols-outlined text-primary mb-1 block" style="font-size: 28px;">military_tech</span>
+</div>
+</div>
+<div class="relative h-3 w-full bg-[#1a160d] rounded-full overflow-hidden mb-2">
+<div class="absolute top-0 left-0 h-full bg-gold-gradient rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(236,182,19,0.5)]" style="width: 68%;"></div>
+</div>
+<div class="flex justify-between text-xs font-medium relative z-10">
+<span class="text-primary">$158 to go</span>
+<span class="text-text-muted">Target: $500</span>
+</div>
+</div>
+</div>
+<!-- Segmented Controls -->
+<div class="px-4 sticky top-[60px] z-40 bg-background-dark/95 backdrop-blur-md py-2 -mx-4 px-8">
+<div class="flex h-10 w-full items-center justify-center rounded-lg bg-card-dark p-1 border border-white/5">
+<label class="flex cursor-pointer h-full flex-1 items-center justify-center rounded-md px-2 transition-all has-[:checked]:bg-primary has-[:checked]:text-black has-[:checked]:shadow-sm text-text-muted hover:text-white text-xs font-bold uppercase tracking-wide">
+<span class="truncate">All</span>
+<input checked="" class="invisible w-0 fixed" name="filter-badges" type="radio" value="All"/>
+</label>
+<label class="flex cursor-pointer h-full flex-1 items-center justify-center rounded-md px-2 transition-all has-[:checked]:bg-primary has-[:checked]:text-black has-[:checked]:shadow-sm text-text-muted hover:text-white text-xs font-bold uppercase tracking-wide">
+<span class="truncate">Unlocked</span>
+<input class="invisible w-0 fixed" name="filter-badges" type="radio" value="Unlocked"/>
+</label>
+<label class="flex cursor-pointer h-full flex-1 items-center justify-center rounded-md px-2 transition-all has-[:checked]:bg-primary has-[:checked]:text-black has-[:checked]:shadow-sm text-text-muted hover:text-white text-xs font-bold uppercase tracking-wide">
+<span class="truncate">Locked</span>
+<input class="invisible w-0 fixed" name="filter-badges" type="radio" value="Locked"/>
+</label>
+</div>
+</div>
+<!-- Trophy Grid -->
+<div class="px-4">
+<div class="grid grid-cols-3 gap-4">
+<!-- Unlocked Badge: First Cancel -->
+<div class="group relative flex flex-col items-center gap-3">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-gradient border border-primary/30 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:shadow-[0_4px_20px_rgba(236,182,19,0.2)] transition-all duration-300">
+<div class="absolute inset-0 bg-primary/5 rounded-2xl"></div>
+<span class="material-symbols-outlined text-4xl text-transparent bg-clip-text bg-gold-gradient drop-shadow-sm">content_cut</span>
+<div class="absolute -bottom-2 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">OCT 12</div>
+</div>
+<div class="text-center">
+<p class="text-white text-xs font-bold leading-tight">First Cancel</p>
+</div>
+</div>
+<!-- Unlocked Badge: Savvy Saver -->
+<div class="group relative flex flex-col items-center gap-3">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-gradient border border-primary/30 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:shadow-[0_4px_20px_rgba(236,182,19,0.2)] transition-all duration-300">
+<div class="absolute inset-0 bg-primary/5 rounded-2xl"></div>
+<span class="material-symbols-outlined text-4xl text-transparent bg-clip-text bg-gold-gradient drop-shadow-sm">savings</span>
+<div class="absolute -bottom-2 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">NOV 03</div>
+</div>
+<div class="text-center">
+<p class="text-white text-xs font-bold leading-tight">Savvy Saver</p>
+</div>
+</div>
+<!-- Unlocked Badge: Trial Master -->
+<div class="group relative flex flex-col items-center gap-3">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-gradient border border-primary/30 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:shadow-[0_4px_20px_rgba(236,182,19,0.2)] transition-all duration-300">
+<div class="absolute inset-0 bg-primary/5 rounded-2xl"></div>
+<span class="material-symbols-outlined text-4xl text-transparent bg-clip-text bg-gold-gradient drop-shadow-sm">timer_off</span>
+<div class="absolute -bottom-2 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">DEC 15</div>
+</div>
+<div class="text-center">
+<p class="text-white text-xs font-bold leading-tight">Trial Master</p>
+</div>
+</div>
+<!-- Unlocked Badge: AI Pioneer -->
+<div class="group relative flex flex-col items-center gap-3">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-gradient border border-primary/30 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:shadow-[0_4px_20px_rgba(236,182,19,0.2)] transition-all duration-300">
+<div class="absolute inset-0 bg-primary/5 rounded-2xl"></div>
+<span class="material-symbols-outlined text-4xl text-transparent bg-clip-text bg-gold-gradient drop-shadow-sm">psychology</span>
+<div class="absolute -bottom-2 bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">JAN 20</div>
+</div>
+<div class="text-center">
+<p class="text-white text-xs font-bold leading-tight">AI Pioneer</p>
+</div>
+</div>
+<!-- Locked Badge: Streak Star -->
+<div class="group relative flex flex-col items-center gap-3 opacity-60">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-locked border border-white/5 shadow-inner">
+<span class="material-symbols-outlined icon-locked text-4xl text-text-muted/30">local_fire_department</span>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/10 text-xl absolute bottom-2 right-2">lock</span>
+</div>
+</div>
+<div class="text-center">
+<p class="text-text-muted text-xs font-medium leading-tight">Streak Star</p>
+</div>
+</div>
+<!-- Locked Badge: Budget Boss -->
+<div class="group relative flex flex-col items-center gap-3 opacity-60">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-locked border border-white/5 shadow-inner">
+<span class="material-symbols-outlined icon-locked text-4xl text-text-muted/30">account_balance_wallet</span>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/10 text-xl absolute bottom-2 right-2">lock</span>
+</div>
+</div>
+<div class="text-center">
+<p class="text-text-muted text-xs font-medium leading-tight">Budget Boss</p>
+</div>
+</div>
+<!-- Locked Badge: Negotiation Ninja -->
+<div class="group relative flex flex-col items-center gap-3 opacity-60">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-locked border border-white/5 shadow-inner">
+<span class="material-symbols-outlined icon-locked text-4xl text-text-muted/30">handshake</span>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/10 text-xl absolute bottom-2 right-2">lock</span>
+</div>
+</div>
+<div class="text-center">
+<p class="text-text-muted text-xs font-medium leading-tight">Negotiation</p>
+</div>
+</div>
+<!-- Locked Badge: Zero Waste -->
+<div class="group relative flex flex-col items-center gap-3 opacity-60">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-locked border border-white/5 shadow-inner">
+<span class="material-symbols-outlined icon-locked text-4xl text-text-muted/30">recycling</span>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/10 text-xl absolute bottom-2 right-2">lock</span>
+</div>
+</div>
+<div class="text-center">
+<p class="text-text-muted text-xs font-medium leading-tight">Zero Waste</p>
+</div>
+</div>
+<!-- Locked Badge: Zen Master -->
+<div class="group relative flex flex-col items-center gap-3 opacity-60">
+<div class="relative flex items-center justify-center size-24 rounded-2xl bg-card-locked border border-white/5 shadow-inner">
+<span class="material-symbols-outlined icon-locked text-4xl text-text-muted/30">self_improvement</span>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/10 text-xl absolute bottom-2 right-2">lock</span>
+</div>
+</div>
+<div class="text-center">
+<p class="text-text-muted text-xs font-medium leading-tight">Zen Master</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

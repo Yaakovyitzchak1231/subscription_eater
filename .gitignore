@@ -1,7 +1,16 @@
+# Node
+node_modules/
+dist/
+.vscode/
+coverage/
+
+# Python
 __pycache__/
 *.pyc
-.env
 .venv/
 venv/
+
+# Environment and DB
+.env
 *.db
 .DS_Store

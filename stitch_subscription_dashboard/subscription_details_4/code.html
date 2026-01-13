@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cancellation Success</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2bee79",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#102217",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body>
+<div class="relative flex h-full min-h-screen w-full flex-col bg-background-light dark:bg-background-dark justify-between font-display p-6 overflow-hidden">
+<div class="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto text-center gap-8 mt-10">
+<div class="relative flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/20 blur-2xl rounded-full w-32 h-32 mx-auto"></div>
+<div class="relative bg-gradient-to-b from-[#193324] to-[#112218] rounded-full p-8 border border-[#234832] shadow-2xl">
+<span class="material-symbols-outlined text-primary text-[64px]" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+</div>
+<div class="space-y-4">
+<h1 class="text-white text-3xl font-extrabold tracking-tight leading-tight">Cancellation<br/>Confirmed</h1>
+<div class="space-y-1">
+<p class="text-[#92c9a8] text-lg font-normal leading-relaxed opacity-80">
+                        Your Netflix access ends on
+                    </p>
+<p class="text-white text-xl font-bold">Jan 15, 2024</p>
+</div>
+</div>
+<div class="w-full bg-[#193324] rounded-2xl border border-[#234832] p-6 shadow-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-primary text-[80px]">savings</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-3">
+<p class="text-[#92c9a8] uppercase tracking-widest text-xs font-bold">Total Yearly Savings</p>
+<p class="text-5xl font-extrabold text-white tracking-tighter">$191.88</p>
+<div class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 border border-primary/20 mt-1">
+<span class="material-symbols-outlined text-primary text-[16px]">smart_toy</span>
+<span class="text-xs font-bold text-primary">Saved via AI Agent</span>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full max-w-md mx-auto flex flex-col gap-3 pb-8 mt-8">
+<button class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-primary text-[#102217] text-base font-bold hover:bg-[#25d36b] transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-[0.98]">
+<span>Return to Dashboard</span>
+</button>
+<button class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-transparent text-[#92c9a8] text-base font-semibold border border-[#234832] hover:bg-[#193324] hover:text-white transition-all active:scale-[0.98]">
+<span>View Confirmation Receipt</span>
+</button>
+</div>
+</div>
+
+</body></html>

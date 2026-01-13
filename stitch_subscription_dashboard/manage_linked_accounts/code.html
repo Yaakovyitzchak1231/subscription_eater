@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manage Linked Accounts</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2bee79",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#102217",
+                        "surface-dark": "#193324",
+                        "surface-border": "#326747",
+                        "text-secondary": "#92c9a8",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white font-display overflow-x-hidden min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="text-[#111418] dark:text-white flex size-12 shrink-0 items-center justify-start cursor-pointer">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</div>
+<h2 class="text-[#111418] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
+            Linked Accounts
+        </h2>
+<div class="flex w-12 items-center justify-end absolute right-4">
+<p class="text-primary dark:text-[#92c9a8] text-base font-bold leading-normal tracking-[0.015em] shrink-0 cursor-pointer">Help</p>
+</div>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 flex flex-col gap-6 pb-10">
+<!-- Feature/Trust Section -->
+<div class="flex flex-col gap-8 px-4 py-6 @container">
+<div class="flex flex-col gap-4">
+<h1 class="text-[#111418] dark:text-white tracking-tight text-[32px] font-bold leading-tight max-w-[720px]">
+                    Secure &amp; Private
+                </h1>
+<p class="text-[#637588] dark:text-white text-base font-normal leading-normal max-w-[720px]">
+                    Your privacy is our priority. We establish a secure, read-only connection to scan for receipts and subscription confirmations. We never read your personal emails.
+                </p>
+</div>
+<div class="grid grid-cols-1 @[480px]:grid-cols-2 gap-3 p-0">
+<!-- Trust Card 1 -->
+<div class="flex flex-1 gap-3 rounded-lg border border-[#e5e7eb] dark:border-surface-border bg-white dark:bg-surface-dark p-4 flex-col shadow-sm">
+<span class="material-symbols-outlined text-[#111418] dark:text-white text-[24px]">shield_lock</span>
+<div class="flex flex-col gap-1">
+<h2 class="text-[#111418] dark:text-white text-base font-bold leading-tight">Read-Only Access</h2>
+<p class="text-[#637588] dark:text-text-secondary text-sm font-normal leading-normal">We cannot send emails or modify your account settings.</p>
+</div>
+</div>
+<!-- Trust Card 2 -->
+<div class="flex flex-1 gap-3 rounded-lg border border-[#e5e7eb] dark:border-surface-border bg-white dark:bg-surface-dark p-4 flex-col shadow-sm">
+<span class="material-symbols-outlined text-[#111418] dark:text-white text-[24px]">visibility_off</span>
+<div class="flex flex-col gap-1">
+<h2 class="text-[#111418] dark:text-white text-base font-bold leading-tight">Private Data</h2>
+<p class="text-[#637588] dark:text-text-secondary text-sm font-normal leading-normal">Data is processed locally on your device where possible.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Connect Button -->
+<div class="flex px-4 py-2">
+<button class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-primary text-[#102217] gap-3 text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#25d36b] transition-colors shadow-md">
+<span class="material-symbols-outlined text-[#102217] text-[24px]">mail</span>
+<span class="truncate">Connect Gmail</span>
+</button>
+</div>
+<!-- Section Header -->
+<div class="flex flex-col">
+<h3 class="text-[#111418] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
+                Active Accounts
+            </h3>
+<!-- List Items -->
+<div class="flex flex-col">
+<!-- Item 1 -->
+<div class="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 min-h-[72px] py-3 justify-between border-b border-[#e5e7eb] dark:border-[#193324]">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary/20" data-alt="User profile avatar gradient" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB2FO74yauuhR3ijZjbYb4btHan_0AkZNuYXF-YemF6RELNlqw540W1MLEIC_W-_8S5-a1s7kfX0wLLdMLBlpXZp6RkNTlUxA5URqLk2A6Huo1L9vEHr4ZHQfSPToLBMb4JMZJa6zbM1V5TuGwsyJBqGzuDJZiaM5PGse7wUWNcc-4nEuyur1DbN-5-yFQp8JdEOkmhrWfH64-s6bLz-lLRQy7i5eSsj1X3eNrWzLnPOz-kSLEIHhWcbz8UpVbKS331tNl32MTvGEE");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-[#111418] dark:text-white text-base font-medium leading-normal line-clamp-1">john.doe@gmail.com</p>
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+<p class="text-[#637588] dark:text-text-secondary text-sm font-normal leading-normal line-clamp-1">Synced: 2m ago</p>
+</div>
+</div>
+</div>
+<button class="shrink-0 p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-[#111418] dark:text-white text-[24px]">delete</span>
+</button>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 min-h-[72px] py-3 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary/20" data-alt="User profile avatar gradient" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2bgsVD-H0_chxBZx4TuH_qUWibKNaYef088Ne0spEPJRen5Qi8o0zeEF0NuCjKegkf0EDYrkf0wiltPgBQ_YMMzD_dMIGFABeL0J7JRfK4hAQO95V1_8jvXrEYk8VNBZ6ARlc2eyl0EPmsdBjTGFH3xj57_ZStTWEaNQB2CA3ed3mhE2VVd-WwRECIXkZtUheMskURfNNieyY-ERDqsbdWlTPGYVxciotM2OCcgzYtDd4baP3g6SkJeRwwq8Oql9o7Qs677thcJ8");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-[#111418] dark:text-white text-base font-medium leading-normal line-clamp-1">sarah.biz@gmail.com</p>
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+<p class="text-[#637588] dark:text-text-secondary text-sm font-normal leading-normal line-clamp-1">Synced: 1h ago</p>
+</div>
+</div>
+</div>
+<button class="shrink-0 p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-[#111418] dark:text-white text-[24px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Links -->
+<div class="px-4 py-6 mt-auto">
+<div class="flex justify-center gap-6">
+<a class="text-sm font-medium text-[#637588] dark:text-[#92c9a8] hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-sm font-medium text-[#637588] dark:text-[#92c9a8] hover:text-primary transition-colors" href="#">Security FAQ</a>
+</div>
+<p class="text-xs text-center text-[#637588] dark:text-[#92c9a8]/60 mt-4">
+                Version 2.5.0 • Build 294
+            </p>
+</div>
+</div>
+<div class="h-5 bg-background-light dark:bg-background-dark"></div>
+</body></html>
