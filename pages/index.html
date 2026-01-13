@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subscription Eater — UI Preview</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1220;
+        --card: #0f1a2f;
+        --text: #e6edf7;
+        --muted: #9fb0c8;
+        --accent: #2bee79;
+        --border: rgba(255, 255, 255, 0.1);
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: radial-gradient(1200px 600px at 20% 0%, rgba(43, 238, 121, 0.15), transparent 60%),
+          radial-gradient(900px 500px at 80% 10%, rgba(77, 160, 255, 0.12), transparent 55%),
+          var(--bg);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 48px auto;
+        padding: 0 20px;
+      }
+      header h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        letter-spacing: -0.02em;
+      }
+      header p {
+        margin: 0 0 24px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+      }
+      .card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 60%), var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+      }
+      .card h2 {
+        font-size: 16px;
+        margin: 0 0 8px;
+      }
+      .card p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      a.btn {
+        display: inline-block;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        color: var(--text);
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      a.btn:hover {
+        border-color: rgba(43, 238, 121, 0.6);
+        box-shadow: 0 0 0 3px rgba(43, 238, 121, 0.12);
+      }
+      footer {
+        margin-top: 22px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.95em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Subscription Eater — UI Preview</h1>
+        <p>
+          Static, shareable previews of the Stitch-branded UI mockups. These pages are not wired to the backend — they’re
+          for viewing the design in a browser.
+        </p>
+      </header>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Welcome</h2>
+          <p>Landing / welcome screen mockup.</p>
+          <a class="btn" href="./stitch_subscription_dashboard/welcome_to_subtracker/code.html">Open preview</a>
+        </div>
+        <div class="card">
+          <h2>Dashboard</h2>
+          <p>Subscription dashboard mockup.</p>
+          <a class="btn" href="./stitch_subscription_dashboard/subscription_dashboard/code.html">Open preview</a>
+        </div>
+      </section>
+
+      <footer>
+        If you need the full app running locally, use the dev setup in <code>README.md</code>.
+      </footer>
+    </div>
+  </body>
+</html>
+
