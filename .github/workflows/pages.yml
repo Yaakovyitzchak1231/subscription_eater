@@ -24,7 +24,8 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p site
-          cp -R pages/* site/
+          cp .nojekyll site/.nojekyll
+          cp index.html site/index.html
           cp -R stitch_subscription_dashboard site/
 
       - name: Upload artifact
@@ -42,4 +43,3 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
