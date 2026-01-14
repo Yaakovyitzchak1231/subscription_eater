@@ -21,7 +21,7 @@ const googleCallback = async (req, res) => {
   const userId = state; // userId is passed back in the state parameter
 
   if (!userId) {
-    return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard?status=error&message=NoUserIdentified`);
+    return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/dashboard?status=error&message=NoUserIdentified`);
   }
 
   try {
@@ -52,10 +52,10 @@ const googleCallback = async (req, res) => {
       }
     });
 
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard?status=success`);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/dashboard?status=success`);
   } catch (error) {
     console.error('OAuth Error:', error);
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard?status=error`);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/dashboard?status=error`);
   }
 };
 

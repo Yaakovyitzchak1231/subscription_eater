@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { isDemoMode } from '../services/dataClient';
 
 const AuthPage = ({ isLogin = true }) => {
   const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ const AuthPage = ({ isLogin = true }) => {
       }
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Authentication failed');
+      setError(err?.response?.data?.error || err?.message || 'Authentication failed');
     }
   };
 
@@ -40,6 +41,11 @@ const AuthPage = ({ isLogin = true }) => {
         </div>
 
         <div className="bg-white dark:bg-surface-dark p-8 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700/30">
+          {isDemoMode && (
+            <div className="mb-5 p-3 rounded-lg bg-primary/10 border border-primary/30 text-slate-700 dark:text-slate-200 text-sm">
+              Demo mode is enabled on this hosted build. Login/register works locally in your browser (no backend required).
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 px-1">
