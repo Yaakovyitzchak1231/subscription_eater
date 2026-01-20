@@ -1,0 +1,3 @@
+## 2024-05-22 - [Duplicate IDs Break Accessibility]
+**Learning:** Duplicate IDs in the DOM (often from messy merges or copy-paste) not only break JavaScript logic but catastrophic for accessibility. Screen readers rely on unique IDs to associate labels with inputs. When IDs are duplicated, the label association becomes ambiguous or fails entirely, leaving users with "Edit text" instead of "Cost Edit text".
+**Action:** Always validate HTML for unique IDs, especially when refactoring legacy code. Use tools or manual checks to ensure form labels consistently point to the correct, unique input ID.
