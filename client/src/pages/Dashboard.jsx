@@ -237,6 +237,7 @@ const Dashboard = () => {
                   type="button"
                   onClick={() => setAddOpen(false)}
                   className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  aria-label="Close modal"
                 >
                   <span className="material-symbols-outlined">close</span>
                 </button>
@@ -244,8 +245,9 @@ const Dashboard = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Name</label>
+                  <label htmlFor="add-name" className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Name</label>
                   <input
+                    id="add-name"
                     value={addForm.name}
                     onChange={(e) => setAddForm((p) => ({ ...p, name: e.target.value }))}
                     required
@@ -255,8 +257,9 @@ const Dashboard = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Amount</label>
+                  <label htmlFor="add-amount" className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Amount</label>
                   <input
+                    id="add-amount"
                     value={addForm.amount}
                     onChange={(e) => setAddForm((p) => ({ ...p, amount: e.target.value }))}
                     type="number"
@@ -268,8 +271,9 @@ const Dashboard = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Billing cycle</label>
+                  <label htmlFor="add-cycle" className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Billing cycle</label>
                   <select
+                    id="add-cycle"
                     value={addForm.billingCycle}
                     onChange={(e) => setAddForm((p) => ({ ...p, billingCycle: e.target.value }))}
                     className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary"
@@ -281,8 +285,9 @@ const Dashboard = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Status</label>
+                  <label htmlFor="add-status" className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Status</label>
                   <select
+                    id="add-status"
                     value={addForm.status}
                     onChange={(e) => setAddForm((p) => ({ ...p, status: e.target.value }))}
                     className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary"
@@ -293,8 +298,9 @@ const Dashboard = () => {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Category</label>
+                  <label htmlFor="add-category" className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Category</label>
                   <input
+                    id="add-category"
                     value={addForm.category}
                     onChange={(e) => setAddForm((p) => ({ ...p, category: e.target.value }))}
                     className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-background-dark border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-primary"
@@ -333,7 +339,11 @@ const Dashboard = () => {
                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{selectedSub.name}</h2>
                   <p className="text-sm text-slate-500">{selectedSub.category}</p>
                 </div>
-                <button onClick={() => setOpenModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <button
+                  onClick={() => setOpenModal(false)}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  aria-label="Close details"
+                >
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
